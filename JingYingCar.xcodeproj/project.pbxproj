@@ -1,0 +1,265 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3DF228201532E73700E9A406 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF2281F1532E73700E9A406 /* UIKit.framework */; };
+		3DF228221532E73700E9A406 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF228211532E73700E9A406 /* Foundation.framework */; };
+		3DF228241532E73700E9A406 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF228231532E73700E9A406 /* CoreGraphics.framework */; };
+		3DF2282A1532E73700E9A406 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3DF228281532E73700E9A406 /* InfoPlist.strings */; };
+		3DF2282C1532E73700E9A406 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2282B1532E73700E9A406 /* main.m */; };
+		3DF228301532E73700E9A406 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DF2282F1532E73700E9A406 /* AppDelegate.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3DF2281B1532E73700E9A406 /* JingYingCar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JingYingCar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DF2281F1532E73700E9A406 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3DF228211532E73700E9A406 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		3DF228231532E73700E9A406 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		3DF228271532E73700E9A406 /* JingYingCar-Info.plist */ = {isa = PBXFileReference; path = "JingYingCar-Info.plist"; sourceTree = "<group>"; };
+		3DF228291532E73700E9A406 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3DF2282B1532E73700E9A406 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3DF2282D1532E73700E9A406 /* JingYingCar-Prefix.pch */ = {isa = PBXFileReference; path = "JingYingCar-Prefix.pch"; sourceTree = "<group>"; };
+		3DF2282E1532E73700E9A406 /* AppDelegate.h */ = {isa = PBXFileReference; path = AppDelegate.h; sourceTree = "<group>"; };
+		3DF2282F1532E73700E9A406 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3DF228181532E73700E9A406 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF228201532E73700E9A406 /* UIKit.framework in Frameworks */,
+				3DF228221532E73700E9A406 /* Foundation.framework in Frameworks */,
+				3DF228241532E73700E9A406 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3DF228101532E73600E9A406 = {
+			isa = PBXGroup;
+			children = (
+				3DF228251532E73700E9A406 /* JingYingCar */,
+				3DF2281E1532E73700E9A406 /* Frameworks */,
+				3DF2281C1532E73700E9A406 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3DF2281C1532E73700E9A406 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2281B1532E73700E9A406 /* JingYingCar.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3DF2281E1532E73700E9A406 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2281F1532E73700E9A406 /* UIKit.framework */,
+				3DF228211532E73700E9A406 /* Foundation.framework */,
+				3DF228231532E73700E9A406 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3DF228251532E73700E9A406 /* JingYingCar */ = {
+			isa = PBXGroup;
+			children = (
+				3DF2282E1532E73700E9A406 /* AppDelegate.h */,
+				3DF2282F1532E73700E9A406 /* AppDelegate.m */,
+				3DF228261532E73700E9A406 /* Supporting Files */,
+			);
+			path = JingYingCar;
+			sourceTree = "<group>";
+		};
+		3DF228261532E73700E9A406 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3DF228271532E73700E9A406 /* JingYingCar-Info.plist */,
+				3DF228281532E73700E9A406 /* InfoPlist.strings */,
+				3DF2282B1532E73700E9A406 /* main.m */,
+				3DF2282D1532E73700E9A406 /* JingYingCar-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3DF2281A1532E73700E9A406 /* JingYingCar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DF228331532E73700E9A406 /* Build configuration list for PBXNativeTarget "JingYingCar" */;
+			buildPhases = (
+				3DF228171532E73700E9A406 /* Sources */,
+				3DF228181532E73700E9A406 /* Frameworks */,
+				3DF228191532E73700E9A406 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JingYingCar;
+			productName = JingYingCar;
+			productReference = 3DF2281B1532E73700E9A406 /* JingYingCar.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3DF228121532E73600E9A406 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 3DF228151532E73600E9A406 /* Build configuration list for PBXProject "JingYingCar" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 3DF228101532E73600E9A406;
+			productRefGroup = 3DF2281C1532E73700E9A406 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3DF2281A1532E73700E9A406 /* JingYingCar */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3DF228191532E73700E9A406 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2282A1532E73700E9A406 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3DF228171532E73700E9A406 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DF2282C1532E73700E9A406 /* main.m in Sources */,
+				3DF228301532E73700E9A406 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		3DF228281532E73700E9A406 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3DF228291532E73700E9A406 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3DF228311532E73700E9A406 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3DF228321532E73700E9A406 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3DF228341532E73700E9A406 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "JingYingCar/JingYingCar-Prefix.pch";
+				INFOPLIST_FILE = "JingYingCar/JingYingCar-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		3DF228351532E73700E9A406 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "JingYingCar/JingYingCar-Prefix.pch";
+				INFOPLIST_FILE = "JingYingCar/JingYingCar-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3DF228151532E73600E9A406 /* Build configuration list for PBXProject "JingYingCar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF228311532E73700E9A406 /* Debug */,
+				3DF228321532E73700E9A406 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DF228331532E73700E9A406 /* Build configuration list for PBXNativeTarget "JingYingCar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DF228341532E73700E9A406 /* Debug */,
+				3DF228351532E73700E9A406 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3DF228121532E73600E9A406 /* Project object */;
+}
