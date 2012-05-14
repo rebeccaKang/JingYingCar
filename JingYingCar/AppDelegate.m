@@ -68,7 +68,6 @@ static UIImage *barImage = nil;
     
     [self getClassTotal];
     
-    NSLog(@"test");
     NSDictionary *dic_configure = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] readConfigure]];
     fontSize = [[dic_configure objectForKey:@"fontSize"] integerValue];
     bufferTime = [[dic_configure objectForKey:@"bufferTime"] integerValue];
