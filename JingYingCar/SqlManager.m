@@ -515,6 +515,45 @@
 	return result;
 }
 
+-(void)deleteHotNews:(NSString *)str_id
+{
+    [lock lock];
+    int result = 1;
+    char *merror = nil;
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select HN_smallImgAddress,HN_largeImgAddress,HN_contentImgAddress from tbl_hotNews where HN_otherID = '%@'",str_id];
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    if (code == SQLITE_ROW) {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+        str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+        str_detail = [self charToString:sqlite3_column_text(stmt, 2)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+    }
+    sqlite3_finalize(stmt);
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_smallImgAddress = '',HN_largeImgAddress = '',HN_isReaded = '0',HN_contentImgAddress = '',HN_isLastShow = '1',HN_isEnabled = '1' where HN_otherID = '%@'",str_id];
+    char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+    result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+    if(result != SQLITE_OK){
+        NSLog(@"deleteHotNews,Failed to update,errorCode:%d",result);
+        NSLog(@"%@",str_sqlOrder);
+    }
+    
+    [lock unlock];
+}
+
 #pragma mark -
 #pragma mark imglist
 
@@ -1047,6 +1086,66 @@
     return result;
 }
 
+-(void)deleteImage:(NSString *)str_id
+{
+    [lock lock];
+    int result = 1;
+    char *merror = nil;
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_smallImgAddress,IMG_largeImgAddress from tbl_images where IMG_otherID = '%@'",str_id];
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    if (code == SQLITE_ROW) {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+        str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+    }
+    sqlite3_finalize(stmt);
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_smallImgAddress = '',HN_largeImgAddress = '',HN_isReaded = '0',HN_contentImgAddress = '',HN_isLastShow = '1',HN_isEnabled = '1' where HN_otherID = '%@'",str_id];
+    char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+    result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+    if(result != SQLITE_OK){
+        NSLog(@"deleteImage,Failed to update,errorCode:%d",result);
+        NSLog(@"%@",str_sqlOrder);
+    }
+    
+    str_sqlOrder = [NSString stringWithFormat:@"select IS_smallImgAddress,IMG_largeImgAddress from tbl_imagesSeries where IS_otherID = '%@'",str_id];
+    sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    code = sqlite3_step(stmt);
+    while(code == SQLITE_ROW) {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+        str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+    }
+    sqlite3_finalize(stmt);
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_smallImgAddress = '',IS_largeImgAddress = '',IS_isEnabled = '1' where IS_otherID = '%@'",str_id];
+    char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+    result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+    if(result != SQLITE_OK){
+        NSLog(@"deleteImage,Failed to update,errorCode:%d",result);
+        NSLog(@"%@",str_sqlOrder);
+    }
+    
+    [lock unlock];
+}
+
 #pragma mark -
 #pragma mark topiclist
 
@@ -1447,6 +1546,41 @@
     return result;
 }
 
+-(void)deleteTopic:(NSString *)str_id
+{
+    [lock lock];
+    int result = 1;
+    char *merror = nil;
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select TPC_imgAddress,TPC_contentImgAddress from tbl_topic where TPC_otherID = '%@'",str_id];
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    if (code == SQLITE_ROW) {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+        str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+        if ([str_detail length] > 0) {
+            [fileManager removeItemAtPath:str_detail error:&error];
+        }
+    }
+    sqlite3_finalize(stmt);
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_imgAddress = '',TPC_isReaded = '0',TPC_contentImgAddress = '',TPC_isLastShow = '1',TPC_isEnabled = '1' where TPC_otherID = '%@'",str_id];
+    char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+    result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+    if(result != SQLITE_OK){
+        NSLog(@"deleteTopic,Failed to update,errorCode:%d",result);
+        NSLog(@"%@",str_sqlOrder);
+    }
+    
+    [lock unlock];
+}
+
 #pragma mark -
 #pragma mark collection
 -(NSInteger)addMyCollectionWithFatherID:(NSString *)str_fatherID childID:(NSString *)str_childID
@@ -1530,7 +1664,6 @@
     int code = sqlite3_step(stmt);
     if (code == SQLITE_ROW) {
         result = 1;
-        NSLog(@"11111");
     }
     sqlite3_finalize(stmt);
     [lock unlock];
@@ -1613,6 +1746,68 @@
 	return result;
 }
 
+-(NSInteger)saveMagazineItem:(NSDictionary *)dic_info
+{
+    [lock lock];
+	NSDate *time = [NSDate date];
+	NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+	[dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+	[dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+	NSString *strTime = [dateForm_time stringFromDate:time];
+	int result = 0;
+    char *merror = nil;
+	char *char_sqlOrder;
+
+    NSString *str_id = [dic_info objectForKey:@"id"];
+    NSString *str_title = [dic_info objectForKey:@"title"];
+    NSString *str_createTime = [dic_info objectForKey:@"createTime"];
+    NSString *str_imgUrl = [dic_info objectForKey:@"coverImgUrl"];
+    NSString *str_url = [dic_info objectForKey:@"url"];
+    NSString *str_summary = [dic_info objectForKey:@"summary"];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select MGZ_createTime from tbl_magazine where MGZ_otherID = '%@' and MGZ_isEnabled = '0'",str_id];
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    if (code == SQLITE_ROW) {
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        if ([str_detail isEqualToString:str_createTime]) {
+            result = 101;
+        }
+        else {
+            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_magazine SET MGZ_createTime = '%@',MGZ_title = '%@',MGZ_summary = '%@',MGZ_coverImgUrl = '%@',MGZ_url = '%@',MGZ_isReaded = '0',MGZ_coverImgAddress = '',MGZ_address = '' where MGZ_otherID = '%@'",str_createTime,str_title,str_summary,str_imgUrl ,str_url,str_id];
+            char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+            result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+            if(result != SQLITE_OK){
+                NSLog(@"saveMagazineItem,Failed to update,errorCode:%d,%@",result,str_sqlOrder);
+            }
+            else {
+                result = 102;
+            }
+        }
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        NSString *str_sqlOrder = [NSString stringWithFormat:@"insert into tbl_magazine(MGZ_title,MGZ_coverImgUrl,MGZ_url,MGZ_isReaded,MGZ_otherID,MGZ_createTime,MGZ_summary) values('%@','%@','%@','0','%@','%@','%@')",str_title,str_imgUrl,str_url,str_id,str_createTime,str_summary];
+        char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+        result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+        //            if (merror) {
+        //                NSLog(@"Failed to insert,errorCode:%d",result);
+        //                //NSLog(@"%@", [NSString stringWithCString:merror]);
+        //            }
+        if(result != SQLITE_OK){
+            NSLog(@"saveTopicList,Failed to insert,errorCode:%d,%@,%@",result,str_id,str_sqlOrder);
+        }
+        else {
+            result = 103;
+        }
+    }
+	[lock unlock];
+	return result;
+}
+
 -(NSArray *)getMagazineList
 {
     [lock lock];
@@ -1643,7 +1838,12 @@
 		[dic_result setObject:str_detail forKey:@"createTime"];
         str_detail = [self charToString:sqlite3_column_text(stmt, 8)];
         [dic_result setObject:str_detail forKey:@"id"];
-        [arr_result addObject:dic_result];
+        if ([arr_result count] == 0) {
+            [arr_result addObject:dic_result];
+        }
+        else {
+            [arr_result insertObject:dic_result atIndex:0];
+        }
         code = sqlite3_step(stmt);
     }
     sqlite3_finalize(stmt);
@@ -1799,6 +1999,42 @@
     return arr_result;
 }
 
+-(NSInteger)deleteMagazine:(NSString *)str_id
+{
+    [lock lock];
+    int result = 1;
+    char *merror = nil;
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select MGZ_address from tbl_magazine where MGZ_otherID = '%@'",str_id];
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    if (code == SQLITE_ROW) {
+        str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        sqlite3_finalize(stmt);
+    }
+    if ([str_detail length] > 0) {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if ([fileManager removeItemAtPath:str_detail error:&error] == YES) {
+            NSString *str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_magazine SET MGZ_address = '',MGZ_isReaded = '0' where MGZ_otherID = '%@'",str_id];
+            char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+            result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+            if(result != SQLITE_OK){
+                NSLog(@"saveMagazine,Failed to update,errorCode:%d",result);
+                NSLog(@"%@",str_sqlOrder);
+            }
+        }
+    }
+    else {
+        result = 0;
+    }
+    
+    [lock unlock];
+    return result;
+}
+
 
 #pragma mark -
 #pragma mark readConfigure
@@ -1845,6 +2081,110 @@
     return result;
 }
 
-
+-(void)emptyBuffer:(int)time
+{
+    int bufferTime = 0;
+    switch (time) {
+        case 0:
+        {
+            bufferTime = 0;
+        }
+            break;
+        case 1:
+        {
+            bufferTime = 24*60*60;
+        }
+            break;
+        case 2:
+        {
+            bufferTime = 24*60*60*7;
+        }
+            break;
+        case 3:
+        {
+            bufferTime = 24*60*60*30;
+        }
+            break;
+        case 4:
+        {
+            bufferTime = -1;
+            return;
+        }
+            break;
+        default:
+            break;
+    }
+    [lock lock];
+    NSMutableArray *arr_item = [[NSMutableArray alloc] init];
+    NSString *str_sqlOrder = @"select HN_createTime,HN_otherID from tbl_hotNews where HN_isEnabled = '0' order by HN_createTime";
+    char *sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    int code = sqlite3_step(stmt);
+    NSString *str_detail = @"";
+    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    while (code == SQLITE_ROW) {
+		str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        NSDate *date_temp = [dateForm_time dateFromString:str_detail];
+        NSTimeInterval timeInterval = [date_temp timeIntervalSinceNow];
+        if (abs(timeInterval) > bufferTime) {
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            [arr_item addObject:str_detail];
+        }
+        code = sqlite3_step(stmt);
+    }
+    sqlite3_finalize(stmt);
+    [lock unlock];
+    for (int i = 0; i < [arr_item count]; i++) {
+        NSString *str_id = [arr_item objectAtIndex:i];
+        [self deleteHotNews:str_id];
+    }
+    [arr_item removeAllObjects];
+    [lock lock];
+    str_sqlOrder = @"select TPC_createTime,TPC_otherID from tbl_topic where TPC_isEnabled = '0' order by TPC_createTime";
+    sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    code = sqlite3_step(stmt);
+    while (code == SQLITE_ROW) {
+		str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        NSDate *date_temp = [dateForm_time dateFromString:str_detail];
+        NSTimeInterval timeInterval = [date_temp timeIntervalSinceNow];
+        if (abs(timeInterval) > bufferTime) {
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            [arr_item addObject:str_detail];
+        }
+        code = sqlite3_step(stmt);
+    }
+    sqlite3_finalize(stmt);
+    [lock unlock];
+    for (int i = 0; i < [arr_item count]; i++) {
+        NSString *str_id = [arr_item objectAtIndex:i];
+        [self deleteTopic:str_id];
+    }
+    [arr_item removeAllObjects];
+    [lock lock];
+    str_sqlOrder = @"select IMG_createTime,IMG_otherID from tbl_hotNews where IMG_isEnabled = '0' order by IMG_createTime";
+    sql = (char *)[str_sqlOrder UTF8String];
+    sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    code = sqlite3_step(stmt);
+    while (code == SQLITE_ROW) {
+		str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
+        NSDate *date_temp = [dateForm_time dateFromString:str_detail];
+        NSTimeInterval timeInterval = [date_temp timeIntervalSinceNow];
+        if (abs(timeInterval) > bufferTime) {
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            [arr_item addObject:str_detail];
+        }
+        code = sqlite3_step(stmt);
+    }
+    sqlite3_finalize(stmt);
+    [lock unlock];
+    for (int i = 0; i < [arr_item count]; i++) {
+        NSString *str_id = [arr_item objectAtIndex:i];
+        [self deleteImage:str_id];
+    }
+}
 
 @end

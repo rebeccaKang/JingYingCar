@@ -53,18 +53,21 @@
 -(NSInteger)getTopicsUnreadedNumber;
 -(NSInteger)getImagesUnreadedNumber;
 
+
 -(NSInteger)saveImageSeries:(NSDictionary *)dic_info ID:(NSString *)str_id;
 -(NSArray *)getImagesSeriesWithID:(NSString *)str_id;
 -(BOOL)saveImagesSeriesImg:(NSString *)str_id imgAddress:(NSString *)imgAddress imgType:(int)imgType  imgID:(NSString *)str_imgID;
 -(NSDictionary *)getImagesSeriesWithID:(NSString *)str_id imgID:(NSString *)str_imgID;
 
 -(NSInteger)saveMagazineList:(NSArray *)list;
+-(NSInteger)saveMagazineItem:(NSDictionary *)dic_info;
 -(BOOL)saveMagezineCover:(NSString *)str_id imgAddress:(NSString *)str_address;
 -(BOOL)saveMagezine:(NSString *)str_id magazineAddress:(NSString *)str_address;
 -(NSDictionary *)getMagazineInfoWithID:(NSString *)magazineID;
 -(NSArray *)getUndownloadedMagazineList;
 -(NSArray *)getDownloadedMagazineList;
 -(NSArray *)getMagazineList;
+-(NSInteger)deleteMagazine:(NSString *)str_id;
 
 -(NSInteger)addMyCollectionWithFatherID:(NSString *)str_fatherID childID:(NSString *)str_childID;
 -(NSArray *)getCollectionList;
@@ -73,6 +76,7 @@
 
 -(NSDictionary *)readConfigure;
 -(BOOL)saveConfigure:(NSDictionary *)dic_parameter;
+-(void)emptyBuffer:(int)time;
 
 -(void)initHotNewsLastShow;
 -(void)initImagesLastShow;

@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
+#import "MagazineUndownloadedViewController.h"
 
-@interface BookshelfViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface BookshelfViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,MagazineEditDelegate>
 {
     UITableView *tbl_bookshelf;
     
-    NSMutableArray *arr_magzine;
+    NSMutableArray *arr_magazine;
     
     NSMutableArray *arr_buttons;
     

@@ -7,12 +7,14 @@
 //
 
 #import "MagazineUndownloadedViewController.h"
+#import "MagazineReadingViewController.h"
 
 @interface MagazineUndownloadedViewController ()
 
 @end
 
 @implementation MagazineUndownloadedViewController
+@synthesize delegate;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -46,12 +48,23 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
+    UIButton *btn_delete = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_delete.frame = CGRectMake(260, 7, 60, 30);
+    [btn_delete setBackgroundImage:[UIImage imageNamed:@"rectButton.png"] forState:UIControlStateNormal];
+    [btn_delete setTitle:@" 删除" forState:UIControlStateNormal];
+    [btn_delete addTarget:self action:@selector(deleteMode) forControlEvents:UIControlEventTouchUpInside];
+    [btn_delete setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btn_delete.titleLabel.font = [UIFont boldSystemFontOfSize:14];
+    btn_delete.titleLabel.textAlignment = UITextAlignmentRight;
+    [view_nav addSubview:btn_delete];
+    
     UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
     view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
     [self.view addSubview:view_content];
     
     arr_magazineData = [[NSMutableArray alloc] init];
-    arr_magazineList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getUndownloadedMagazineList]];
+    arr_magazineList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getMagazineList]];
+    NSLog(@"arr_magazineList:%@",arr_magazineList);
     
     tbl_magazineList = [[UITableView alloc] initWithFrame:view_content.bounds style:UITableViewStylePlain];
     tbl_magazineList.backgroundColor = [UIColor clearColor];
@@ -60,6 +73,8 @@
     tbl_magazineList.separatorStyle = UITableViewCellSeparatorStyleNone;
     //tbl_magazineList.userInteractionEnabled = NO;
     [view_content addSubview:tbl_magazineList];
+    
+    isDeleteMode = NO;
 }
 
 - (void)viewDidLoad
@@ -90,7 +105,7 @@
 {
     [sender setTitle:@"正在下载" forState:UIControlStateNormal];
     sender.enabled = NO;
-    UITableViewCell *cell = (UITableViewCell *)sender.superview.superview;
+    UITableViewCell *cell = (UITableViewCell *)sender.superview.superview.superview;
     NSIndexPath *indexpath = [tbl_magazineList indexPathForCell:cell];
     NSDictionary *dic_info = [arr_magazineList objectAtIndex:indexpath.row];
     
@@ -122,16 +137,28 @@
 	[app.netWorkQueue addOperation:request];
 }
 
-//-(void)readMagazine:(UIButton *)sender
-//{
-//    UITableViewCell *cell = (UITableViewCell *)sender.superview.superview;
-//    NSIndexPath *indexpath = [tbl_magazineList indexPathForCell:cell];
-//    NSDictionary *dic_info = [arr_magazineList objectAtIndex:indexpath.row];
-//    MagazineReadingViewController *con_reading = [[MagazineReadingViewController alloc] init];
-//    NSString *str_id = [dic_info objectForKey:@"id"];
-//    con_reading.magazineID = str_id;
-//    [self.navigationController pushViewController:con_reading animated:YES];
-//}
+-(void)readMagazine:(UIButton *)sender
+{
+    UITableViewCell *cell = (UITableViewCell *)sender.superview.superview;
+    NSIndexPath *indexpath = [tbl_magazineList indexPathForCell:cell];
+    NSDictionary *dic_info = [arr_magazineList objectAtIndex:indexpath.row];
+    MagazineReadingViewController *con_reading = [[MagazineReadingViewController alloc] init];
+    NSString *str_id = [dic_info objectForKey:@"id"];
+    con_reading.magazineID = str_id;
+    [self.navigationController pushViewController:con_reading animated:YES];
+}
+
+-(void)deleteMode
+{
+    if (isDeleteMode == NO) {
+        [tbl_magazineList setEditing:YES animated:YES];
+    }
+    else {
+        [tbl_magazineList setEditing:NO animated:YES];
+    }
+    isDeleteMode = !isDeleteMode;
+    [tbl_magazineList reloadData];
+}
 
 #pragma mark -
 #pragma mark tableViewDelegate
@@ -163,7 +190,7 @@
         UIView *view_bk = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 90)];
         view_bk.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"magazineTableview.png"]];
         view_bk.tag = 0;
-        [cell addSubview:view_bk];
+        [cell.contentView addSubview:view_bk];
         //cell.userInteractionEnabled = NO;
         
         UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 60, 80)];
@@ -200,16 +227,25 @@
         [btn_download addTarget:self action:@selector(downloadMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_download];
         
+        UIButton *btn_read = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn_read.frame = CGRectMake(230, 30, 80, 30);
+        [btn_read setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
+        [btn_read setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [btn_read setTitle:@"阅读" forState:UIControlStateNormal];
+        btn_read.tag = 6;
+        [btn_read addTarget:self action:@selector(readMagazine:) forControlEvents:UIControlEventTouchUpInside];
+        [view_bk addSubview:btn_read];
+        
         UIImageView *imgView_progressBottom = [[UIImageView alloc] initWithFrame:CGRectMake(230, 70, 80, 10)];
-        imgView_progressBottom.image = [UIImage imageNamed:@"scheduleBarBottom.png"];
+        imgView_progressBottom.image = [UIImage imageNamed:@"pgBottom.png"];
         [view_bk addSubview:imgView_progressBottom];
         imgView_progressBottom.hidden = YES; 
-        imgView_progressBottom.tag = 6;
+        imgView_progressBottom.tag = 7;
         
         UIImageView *imgView_progressTop = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, 10)];
-        imgView_progressTop.image = [UIImage imageNamed:@"scheduleBarTop.png"];
+        imgView_progressTop.image = [UIImage imageNamed:@"pgTop.png"];
         [imgView_progressBottom addSubview:imgView_progressTop];
-        imgView_progressTop.tag = 7;
+        imgView_progressTop.tag = 8;
         
         //        UIButton *btn_read = [UIButton buttonWithType:UIButtonTypeCustom];
         //        btn_read.frame = CGRectMake(230, 10, 80, 30);
@@ -224,7 +260,7 @@
     }
     
     if ([arr_magazineList count] >= indexPath.row +1) {
-        UIView *view_bk = [cell viewWithTag:0];
+        UIView *view_bk = [cell.contentView viewWithTag:0];
         NSDictionary *dic_news = [arr_magazineList objectAtIndex:indexPath.row];
         NSString *str_coverAddress = [dic_news objectForKey:@"coverImgAddress"];
         UIImage *img_cover;
@@ -246,32 +282,41 @@
         UILabel *lb_createTime = (UILabel *)[view_bk viewWithTag:4];
         lb_createTime.text = [[dic_news objectForKey:@"createTime"] substringToIndex:10];
         
-//        NSString *str_address = [dic_news objectForKey:@"address"];
-//        UIButton *btn_download = (UIButton *)[view_bk viewWithTag:5];
-//        UIButton *btn_read = (UIButton *)[view_bk viewWithTag:6];
-//        UIButton *btn_delete = (UIButton *)[view_bk viewWithTag:7];
-//        if ([str_address length] > 0) {
-//            btn_download.hidden = YES;
-//            btn_read.hidden = NO;
-//            btn_delete.hidden = NO;
-//        }
-//        else {
-//            btn_download.hidden = NO;
-//            btn_read.hidden = YES;
-//            btn_delete.hidden = YES;
-//        }
-        UIImageView *imgView_progressBottem = (UIImageView *)[view_bk viewWithTag:6];
-        if (imgView_progressBottem.hidden == NO) {
-            UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:7];
-            NSString *str_id = [dic_news objectForKey:@"id"];
-            for (int i = 0; i < [arr_magazineData count]; i++) {
-                NSMutableDictionary *dic_magazineData = [arr_magazineData objectAtIndex:i];
-                NSString *str_tempID = [dic_magazineData objectForKey:@"id"];
-                if ([str_id isEqualToString:str_tempID]) {
-                    CGFloat percent = [[dic_magazineData objectForKey:@"percent"] floatValue];
-                    imgView_top.frame = CGRectMake(0, 0, 80*percent, 10);
-                    break;
+        NSString *str_address = [dic_news objectForKey:@"address"];
+        UIButton *btn_download = (UIButton *)[view_bk viewWithTag:5];
+        UIButton *btn_read = (UIButton *)[view_bk viewWithTag:6];
+        //UIButton *btn_delete = (UIButton *)[view_bk viewWithTag:7];
+        if (tableView.editing == YES) {
+            //btn_download.hidden = YES;
+            btn_read.hidden = YES;
+        }
+        else {
+            if ([str_address length] > 0) {
+                btn_download.hidden = YES;
+                btn_read.hidden = NO;
+                //btn_delete.hidden = NO;
+            }
+            else {
+                btn_download.hidden = NO;
+                btn_read.hidden = YES;
+                //btn_delete.hidden = YES;
+            }
+        }
+        
+        NSString *str_id = [dic_news objectForKey:@"id"];
+        for (int i = 0; i < [arr_magazineData count]; i++) {
+            NSMutableDictionary *dic_magazineData = [arr_magazineData objectAtIndex:i];
+            NSString *str_tempID = [dic_magazineData objectForKey:@"id"];
+            if ([str_id isEqualToString:str_tempID]) {
+                UIImageView *imgView_progressBottem = (UIImageView *)[view_bk viewWithTag:7];
+                if (imgView_progressBottem.hidden == YES) {
+                    imgView_progressBottem.hidden = NO;
                 }
+                
+                UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:8];
+                CGFloat percent = [[dic_magazineData objectForKey:@"percent"] floatValue];
+                imgView_top.frame = CGRectMake(0, 0, 80*percent, 10);
+                break;
             }
         }
     }
@@ -290,8 +335,43 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
-    
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+// Override to support editing the table view.
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        // Delete the row from the data source.
+        NSDictionary *dic_magazine = [arr_magazineList objectAtIndex:indexPath.row];
+        NSString *str_id = [dic_magazine objectForKey:@"id"];
+        if ([[SqlManager sharedManager] deleteMagazine:str_id] == 0) {
+            [arr_magazineList removeObjectAtIndex:indexPath.row];
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [delegate commitEditing:str_id];
+        }
+        //[self reload];
+    }   
+    else if (editingStyle == UITableViewCellEditingStyleInsert) {
+        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+    }
+}
+
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (isDeleteMode == YES) {
+        NSDictionary *dic_info = [arr_magazineList objectAtIndex:indexPath.row];
+        NSString *str_address = [dic_info objectForKey:@"address"];
+        if ([str_address length] > 0) {
+            return UITableViewCellEditingStyleDelete;
+        }
+        else {
+            return UITableViewCellAccessoryNone;
+        }
+    }
+    else {
+        return UITableViewCellAccessoryNone;
+    }
+    return UITableViewCellAccessoryNone;
 }
 
 #pragma mark -
@@ -311,7 +391,6 @@
 
 -(void)request:(ASIHTTPRequest *)request didReceiveData:(NSData *)data
 {
-    NSLog(@"downloading:%@,%d",request.userInfo,data.length);
     NSDictionary *dic_userInfo = request.userInfo;
     NSString *str_id = [dic_userInfo objectForKey:@"id"];
     for (int i = 0; i < [arr_magazineData count]; i++) {
@@ -346,11 +425,12 @@
     
     if ([str_operate isEqualToString:@"downloadMagazine"]) {
         UIButton *btn_temp = [dic_userInfo objectForKey:@"button"];
-        [btn_temp setTitle:@"已下载" forState:UIControlStateNormal];
+        //[btn_temp setTitle:@"已下载" forState:UIControlStateNormal];
         
-        UIImageView *imgView_progressBottem = (UIImageView *)[btn_temp.superview viewWithTag:6];
-        UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:7];
+        UIImageView *imgView_progressBottem = (UIImageView *)[btn_temp.superview.superview viewWithTag:7];
+        UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:8];
         imgView_top.frame = CGRectMake(0, 0, 80, 10);
+        imgView_progressBottem.hidden = YES;
         
         NSString *str_id = [dic_userInfo objectForKey:@"id"];
         for (int i = 0; i < [arr_magazineData count]; i++) {
@@ -365,6 +445,7 @@
                 if ([[SqlManager sharedManager] saveDoc:data_magazine address:str_address] == YES) {
                     [[SqlManager sharedManager] saveMagezine:str_id magazineAddress:str_address];
                     [arr_magazineData removeObjectAtIndex:i];
+                    [delegate commitEditing:str_id];
                 }
             }
         }
@@ -375,6 +456,7 @@
                 NSDictionary *dic_magazine = [[SqlManager sharedManager] getMagazineInfoWithID:str_id];
                 [arr_magazineList replaceObjectAtIndex:i withObject:dic_magazine];
                 [tbl_magazineList reloadData];
+                break;
             }
         }
     }

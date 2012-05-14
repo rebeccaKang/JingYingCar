@@ -91,7 +91,7 @@
 //        [self.navigationController.navigationBar setImage:@"navHotNews.png"];
 //    }
     
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];

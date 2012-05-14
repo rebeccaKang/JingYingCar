@@ -116,6 +116,8 @@
 //    transition.subtype = kCATransitionFromTop;
 //    transition.delegate = self;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    [[SqlManager sharedManager] emptyBuffer:app.bufferTime];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

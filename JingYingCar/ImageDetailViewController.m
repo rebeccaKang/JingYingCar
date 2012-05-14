@@ -904,7 +904,7 @@
         }
         
         NSMutableDictionary *dic_newInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getImagesSeriesWithID:str_id imgID:str_imgID]];
-        
+
         for (int i = 0; i < [arr_imgList count]; i++) {
             NSDictionary *dic_oldInfo = [arr_imgList objectAtIndex:i];
             NSString *str_oldImgID = [dic_oldInfo objectForKey:@"imgID"];
@@ -916,7 +916,9 @@
                 [dic_newInfo setObject:lb_title forKey:@"lb_title"];
                 [dic_newInfo setObject:tv_content forKey:@"tv_content"];
                 [dic_newInfo setObject:imgView forKey:@"imgView"];
-                [dic_newInfo setObject:imgView_small forKey:@"smallImgView"];
+                if (imgView_small != nil) {
+                    [dic_newInfo setObject:imgView_small forKey:@"smallImgView"];
+                }
                 [arr_imgList replaceObjectAtIndex:i withObject:dic_newInfo];
             }
         }

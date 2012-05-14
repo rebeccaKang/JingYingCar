@@ -9,7 +9,6 @@
 #import "BookshelfViewController.h"
 #import "MagazineDownloadedViewController.h"
 #import "MagazineReadingViewController.h"
-#import "MagazineUndownloadedViewController.h"
 
 @interface BookshelfViewController ()
 
@@ -32,10 +31,9 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     
-    //arr_magzine = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getMagazineList]];
-    
-    arr_magzine = [[NSMutableArray alloc] init];
-    [self requestMagzineList];
+    arr_magazine = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getMagazineList]];
+    //arr_magzine = [[NSMutableArray alloc] init];
+    [self requestMagazineList];
 }
 
 - (void)viewDidLoad
@@ -96,34 +94,10 @@
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
     NSString *str_shouldRequest = [app.arr_shouldRequest objectAtIndex:3];
     if ([str_shouldRequest isEqualToString:@"0"]) {
-        [self requestMagzineList];
+        [self requestMagazineList];
+        [app.arr_shouldRequest replaceObjectAtIndex:3 withObject:@"1"];
     }
-    for (int i = 0; i < [arr_magzine count]; i++) {
-        NSDictionary *dic_magazine = [arr_magzine objectAtIndex:i];
-        NSString *str_id = [dic_magazine objectForKey:@"id"];
-        UIButton *btn_magazine = [dic_magazine objectForKey:@"button"];
-        NSMutableDictionary *dic_newInfo = [[[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]] mutableCopy];
-        [dic_newInfo setObject:btn_magazine forKey:@"button"];
-        [arr_magzine replaceObjectAtIndex:i withObject:dic_newInfo];
-        UIImage *img;
-        NSString *str_address = [dic_newInfo objectForKey:@"address"];
-        if ([str_address length] > 0) {
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            NSString *str_imgAddress = [dic_newInfo objectForKey:@"coverImgAddress"];
-            NSData *data_img = [fileManager contentsAtPath:str_imgAddress];
-            img = [UIImage imageWithData:data_img];
-        }
-        else {
-            UIImage *image = [UIImage imageNamed:@"bookcover.png"];
-            UIGraphicsBeginImageContext(image.size);
-            [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
-            //CGContextRef context = UIGraphicsGetCurrentContext();
-            CGImageRef imageRef = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
-            img =  [UIImage imageWithCGImage:imageRef];  
-            UIGraphicsEndImageContext();
-        }
-        [btn_magazine setBackgroundImage:img forState:UIControlStateNormal];
-    }
+    [self reloadViews];
 }
 
 - (void)viewDidUnload
@@ -139,15 +113,57 @@
 
 -(void)reloadViews
 {
-    
+    for (int i = 0; i < [arr_magazine count]; i++) {
+        NSDictionary *dic_magazine = [arr_magazine objectAtIndex:i];
+        UIButton *btn_magazine = [dic_magazine objectForKey:@"button"];
+        if (btn_magazine == nil) {
+            btn_magazine = [UIButton buttonWithType:UIButtonTypeCustom];
+            [btn_magazine addTarget:self action:@selector(turnToDetail:) forControlEvents:UIControlEventTouchUpInside];
+            [view_content addSubview:btn_magazine];
+            [arr_magazine replaceObjectAtIndex:i withObject:dic_magazine];
+        }
+        NSString *str_id = [dic_magazine objectForKey:@"id"];
+        NSMutableDictionary *dic_newInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
+        [dic_newInfo setObject:btn_magazine forKey:@"button"];
+        [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
+        int row = i/4;
+        int col = i%4;
+        btn_magazine.frame = CGRectMake(10+80*col, 10+93*row, 50, 60);
+        UIImage *img;
+        NSString *str_address = [dic_newInfo objectForKey:@"address"];
+        NSString *str_imgAddress = [dic_newInfo objectForKey:@"coverImgAddress"];
+        if ([str_address length] > 0) {
+            if ([str_imgAddress length] > 0) {
+                img = [UIImage imageWithContentsOfFile:str_imgAddress];
+            }
+            else {
+                [self requestCover:dic_newInfo];
+            }
+        }
+        else {
+            if ([str_imgAddress length] > 0) {
+                UIImage *image = [UIImage imageNamed:@"bookcover.png"];
+                UIGraphicsBeginImageContext(image.size);
+                [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
+                //CGContextRef context = UIGraphicsGetCurrentContext();
+                CGImageRef imageRef = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
+                img =  [UIImage imageWithCGImage:imageRef];  
+                UIGraphicsEndImageContext();
+            }
+            else {
+                [self requestCover:dic_newInfo];
+            }
+        }
+        [btn_magazine setBackgroundImage:img forState:UIControlStateNormal];
+    }
 }
 
 #pragma mark -
 #pragma mark buttonFunction
 -(void)turnToDetail:(UIButton *)sender
 {
-    for (int i = 0; i < [arr_magzine count]; i++) {
-        NSDictionary *dic_temp = [arr_magzine objectAtIndex:i];
+    for (int i = 0; i < [arr_magazine count]; i++) {
+        NSDictionary *dic_temp = [arr_magazine objectAtIndex:i];
         UIButton *btn_temp = [dic_temp objectForKey:@"button"];
         if (btn_temp == sender) {
             NSString *str_address = [dic_temp objectForKey:@"address"];
@@ -173,13 +189,34 @@
 
 -(void)turnToEditMagazine:(UIButton *)sender
 {
-    MagazineDownloadedViewController *con_magazineInfo = [[MagazineDownloadedViewController alloc] init];
+//    MagazineDownloadedViewController *con_magazineInfo = [[MagazineDownloadedViewController alloc] init];
+//    [self.navigationController pushViewController:con_magazineInfo animated:YES];
+    MagazineUndownloadedViewController *con_magazineInfo = [[MagazineUndownloadedViewController alloc] init];
+    con_magazineInfo.delegate = self;
     [self.navigationController pushViewController:con_magazineInfo animated:YES];
 }
 
+#pragma mark - editMagazineDelegate
+-(void)commitEditing:(NSString *)str_id
+{
+    for (int i = 0; i < [arr_magazine count]; i++) {
+        NSDictionary *dic_oldInfo = [arr_magazine objectAtIndex:i];
+        NSString *str_oldId = [dic_oldInfo objectForKey:@"id"];
+        if ([str_id isEqualToString:str_oldId]) {
+            NSMutableDictionary *dic_newInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
+            NSLog(@"%@",dic_newInfo);
+            UIButton *btn_old = [dic_oldInfo objectForKey:@"button"];
+            [dic_newInfo setObject:btn_old forKey:@"button"];
+            [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
+            break;
+        }
+    }
+}
+
+
 #pragma mark -
 #pragma mark connection
--(void)requestMagzineList
+-(void)requestMagazineList
 {
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@",DEFAULT_URL]];
     //设置
@@ -189,12 +226,12 @@
     //设置是是否支持断点下载
 	[request setAllowResumeForFileDownloads:NO];
 	//设置基本信息
-    NSString *httpBodyString = [self magzineListRequestBody];
+    NSString *httpBodyString = [self magazineListRequestBody];
 	NSLog(@"request topiclist  httpBodyString :%@",httpBodyString);
 	
     NSData *postData = [httpBodyString dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableDictionary *dic_userInfo = [[NSMutableDictionary alloc] init];
-    [dic_userInfo setObject:@"requestMagzineList" forKey:@"operate"];
+    [dic_userInfo setObject:@"requestMagazineList" forKey:@"operate"];
     [request setUserInfo:dic_userInfo];
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
@@ -203,7 +240,7 @@
 	[app.netWorkQueue addOperation:request];
 }
 
--(NSString *)magzineListRequestBody
+-(NSString *)magazineListRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetMagazine"];
     NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
@@ -253,7 +290,7 @@
     NSString *responseString = [[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding];
     NSLog(@"responseString3:%@",responseString);
     
-    if ([str_operate isEqualToString:@"requestMagzineList"]) {
+    if ([str_operate isEqualToString:@"requestMagazineList"]) {
         NSError *error = nil;
         DDXMLDocument* xmlDoc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:&error];
         if (error) {
@@ -288,54 +325,100 @@
                 NSArray *arr_update = [element_item elementsForName:@"Update"];
                 NSString *str_update = [[arr_update objectAtIndex:0] stringValue];
                 [dic_itemSaved setObject:str_update forKey:@"createTime"];
-                UIButton *btn_magzine = [UIButton buttonWithType:UIButtonTypeCustom];
-                int row = [arr_total count]/4;
-                int col = [arr_total count]%4;
-                btn_magzine.frame = CGRectMake(10+80*col, 10+93*row, 60, 60);
-                [btn_magzine setBackgroundImage:[UIImage imageNamed:@"bookcover.png"] forState:UIControlStateNormal];
-                [view_content addSubview:btn_magzine];
-                [dic_itemSaved setObject:btn_magzine forKey:@"button"];
-                [arr_total addObject:dic_itemSaved];
+//                UIButton *btn_magazine = [UIButton buttonWithType:UIButtonTypeCustom];
+//                int row = [arr_total count]/4;
+//                int col = [arr_total count]%4;
+//                btn_magazine.frame = CGRectMake(10+80*col, 10+93*row, 60, 40);
+//                [btn_magazine setBackgroundImage:[UIImage imageNamed:@"bookcover.png"] forState:UIControlStateNormal];
+//                [view_content addSubview:btn_magazine];
+//                [dic_itemSaved setObject:btn_magazine forKey:@"button"];
+//                [arr_total addObject:dic_itemSaved];
+                
+                int result = [[SqlManager sharedManager] saveMagazineItem:dic_itemSaved];
+                
+                NSMutableDictionary *dic_newInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
+                if (result == 102) {
+                    for (int i = 0; i < [arr_magazine count]; i++) {
+                        NSDictionary *dic_magazine = [arr_magazine objectAtIndex:i];
+                        NSString *str_tempId = [dic_magazine objectForKey:@"id"];
+                        if ([str_tempId isEqualToString:str_id] ) {
+                            UIButton *btn_temp = [dic_magazine objectForKey:@"button"];
+                            [dic_newInfo setObject:btn_temp forKey:@"button"];
+                            [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
+                            [self requestCover:dic_newInfo];
+                            break;
+                        }
+                    }
+                }
+                else if(result == 103)
+                {
+                    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+                    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+                    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                    UIButton *btn_magazine = [UIButton buttonWithType:UIButtonTypeCustom];
+                    [btn_magazine addTarget:self action:@selector(turnToDetail:) forControlEvents:UIControlEventTouchUpInside];
+                    [view_content addSubview:btn_magazine];
+                    [dic_newInfo setObject:btn_magazine forKey:@"button"];
+                    for (int i = 0; i < [arr_magazine count]; i++) {
+                        NSDictionary *dic_topImg = [arr_magazine objectAtIndex:i];
+                        NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
+                        NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
+                        NSDate *date_current = [dateForm_time dateFromString:str_update];
+                        if ([date_current compare:date_temp] == NSOrderedDescending) {
+                            [arr_magazine insertObject:dic_newInfo atIndex:i];
+                            break;
+                        }
+                        else if(i == [arr_magazine count] - 1) 
+                        {
+                            [arr_magazine addObject:dic_newInfo];
+                            break;
+                        }
+                    }
+                    if ([arr_magazine count] == 0) {
+                        [arr_magazine addObject:dic_newInfo];
+                    }
+                }
+                [self reloadViews];
             }
         }
         
-        [[SqlManager sharedManager] saveMagazineList:arr_total];
-        for (int i = 0; i < [arr_total count]; i++) {
-            NSDictionary *dic_temp = [arr_total objectAtIndex:i];
-            NSString *str_id = [dic_temp objectForKey:@"id"];
-            NSMutableDictionary *dic_tempInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
-            UIButton *btn_magazine = (UIButton *)[dic_temp objectForKey:@"button"];
-            [dic_tempInfo setObject:btn_magazine forKey:@"button"];
-            [btn_magazine addTarget:self action:@selector(turnToDetail:) forControlEvents:UIControlEventTouchUpInside];
-            NSString *str_imgAddress= [dic_tempInfo objectForKey:@"coverImgAddress"];
-            if ([str_imgAddress length] == 0) {
-                [self requestCover:dic_tempInfo];
-            }
-            else {
-                UIImage *img;
-                if ([str_imgAddress length] > 0) {
-                    NSFileManager *fileManager = [NSFileManager defaultManager];
-                    NSData *data_img = [fileManager contentsAtPath:str_imgAddress];
-                    UIImage *image = [UIImage imageWithData:data_img];
-                    NSString *str_address = [dic_tempInfo objectForKey:@"address"];
-                    if ([str_address length] > 0) {
-                        img = image;
-                    }
-                    else {
-                        // Draw image1
-                        UIGraphicsBeginImageContext(image.size);
-                        //用当前的图形上下文的资源。
-                        [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
-                        //CGContextRef context = UIGraphicsGetCurrentContext();
-                        CGImageRef image = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
-                        img =  [UIImage imageWithCGImage:image];  
-                        UIGraphicsEndImageContext();
-                    }
-                }
-                [btn_magazine setBackgroundImage:img forState:UIControlStateNormal];
-            }
-            [arr_magzine addObject:dic_tempInfo];
-        }
+//        [[SqlManager sharedManager] saveMagazineList:arr_total];
+//        for (int i = 0; i < [arr_total count]; i++) {
+//            NSDictionary *dic_temp = [arr_total objectAtIndex:i];
+//            NSString *str_id = [dic_temp objectForKey:@"id"];
+//            NSMutableDictionary *dic_tempInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
+//            UIButton *btn_magazine = (UIButton *)[dic_temp objectForKey:@"button"];
+//            [dic_tempInfo setObject:btn_magazine forKey:@"button"];
+//            [btn_magazine addTarget:self action:@selector(turnToDetail:) forControlEvents:UIControlEventTouchUpInside];
+//            NSString *str_imgAddress= [dic_tempInfo objectForKey:@"coverImgAddress"];
+//            if ([str_imgAddress length] == 0) {
+//                [self requestCover:dic_tempInfo];
+//            }
+//            else {
+//                UIImage *img;
+//                if ([str_imgAddress length] > 0) {
+//                    NSFileManager *fileManager = [NSFileManager defaultManager];
+//                    NSData *data_img = [fileManager contentsAtPath:str_imgAddress];
+//                    UIImage *image = [UIImage imageWithData:data_img];
+//                    NSString *str_address = [dic_tempInfo objectForKey:@"address"];
+//                    if ([str_address length] > 0) {
+//                        img = image;
+//                    }
+//                    else {
+//                        // Draw image1
+//                        UIGraphicsBeginImageContext(image.size);
+//                        //用当前的图形上下文的资源。
+//                        [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
+//                        //CGContextRef context = UIGraphicsGetCurrentContext();
+//                        CGImageRef image = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
+//                        img =  [UIImage imageWithCGImage:image];  
+//                        UIGraphicsEndImageContext();
+//                    }
+//                }
+//                [btn_magazine setBackgroundImage:img forState:UIControlStateNormal];
+//            }
+//            [arr_magazine addObject:dic_tempInfo];
+//        }
     }
     else if ([str_operate isEqualToString:@"downloadImg"]) {
         UIImage *image = [[UIImage alloc] initWithData:request.responseData];
@@ -347,19 +430,21 @@
         if ([[SqlManager sharedManager] saveDoc:request.responseData address:str_address] == YES) {
             [[SqlManager sharedManager] saveMagezineCover:str_id imgAddress:str_address];
         }
-        for (int i = 0; i < [arr_magzine count]; i++) {
-            NSDictionary *dic_temp = [arr_magzine objectAtIndex:i];
+        NSMutableDictionary *dic_newInfo = [[NSMutableDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getMagazineInfoWithID:str_id]];
+        for (int i = 0; i < [arr_magazine count]; i++) {
+            NSDictionary *dic_temp = [arr_magazine objectAtIndex:i];
             NSString *str_tempID = [dic_temp objectForKey:@"id"];
             if ([str_id isEqualToString:str_tempID]) {
-                UIButton *btn_magzine = [dic_temp objectForKey:@"button"];
+                UIButton *btn_magazine = [dic_temp objectForKey:@"button"];
                 UIGraphicsBeginImageContext(image.size);
                 [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
                 //CGContextRef context = UIGraphicsGetCurrentContext();
                 CGImageRef imageRef = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
                 UIImage *img =  [UIImage imageWithCGImage:imageRef];  
                 UIGraphicsEndImageContext();
-                [[SqlManager sharedManager] saveDoc:UIImagePNGRepresentation(image) address:str_address];
-                [btn_magzine setBackgroundImage:img forState:UIControlStateNormal];
+                [btn_magazine setBackgroundImage:img forState:UIControlStateNormal];
+                [dic_newInfo setObject:btn_magazine forKey:@"button"];
+                [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
                 break;
             }
         }
