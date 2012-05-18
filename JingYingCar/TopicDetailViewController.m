@@ -31,7 +31,7 @@
     [super loadView];
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
-    
+    arr_requests = [[NSMutableArray alloc] init];
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
@@ -41,7 +41,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7, 50, 30);
+    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
     [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
@@ -123,8 +123,8 @@
         sclView_topic.backgroundColor = [UIColor clearColor];
         [view_content addSubview:sclView_topic];
         
-        lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
-        lb_title.font = [UIFont boldSystemFontOfSize:20];
+        lb_title = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 300, 60)];
+        lb_title.font = [UIFont boldSystemFontOfSize:18];
         lb_title.textAlignment = UITextAlignmentLeft;
         lb_title.backgroundColor = [UIColor clearColor];
         lb_title.textColor = [UIColor whiteColor];
@@ -280,6 +280,7 @@
 #pragma mark buttonFunction
 -(void)turnBack
 {
+    [self cancelAllRequests];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -592,6 +593,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)detailRequestBody
@@ -619,6 +621,9 @@
 -(void)requestImage:(NSString *)url
 {
     NSURL *_url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,url]];
+    if ([url length] == 0) {
+        return;
+    }
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:_url];
 	//设置ASIHTTPRequest代理
@@ -638,6 +643,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 #pragma mark -
@@ -709,6 +715,7 @@
         }
         UIImage *img = [[UIImage alloc] initWithData:request.responseData];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = @"";
@@ -775,6 +782,15 @@
     if (([indView isAnimating] == NO)) {
         [indView startAnimating];
     }
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 #pragma mark - WBSendViewDelegate Methods

@@ -21,6 +21,8 @@
     BOOL isGettingLater;
     
     UIActivityIndicatorView *indViewLarge;
+    
+    NSMutableArray *arr_requests;
 }
 
 @property (nonatomic) NSInteger type;

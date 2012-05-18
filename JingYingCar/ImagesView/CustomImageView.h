@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CustomImageView : UIView
+@interface CustomImageView : UIView<UIGestureRecognizerDelegate>
 {
     NSString *str_id;
     UIImageView *imgView;

@@ -57,6 +57,7 @@
     [super loadView];
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
+    arr_requests = [[NSMutableArray alloc] init];
     arr_imgList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getImagesList]];
     arr_topImgs = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getImagesTopList]];
     
@@ -95,6 +96,9 @@
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.layer.shadowOffset = CGSizeMake(0, 1);
+    view_nav.layer.shadowOpacity = 1;
+    view_nav.layer.shadowColor = [UIColor blackColor].CGColor;
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -130,6 +134,13 @@
     sclView_top.scrollsToTop = NO;
     sclView_top.directionalLockEnabled = YES;
     sclView_top.delegate = self;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapLargeImage:)];
+    tap.numberOfTapsRequired = 1;
+    tap.numberOfTouchesRequired = 1;
+    tap.delegate = self;
+    [sclView_top addGestureRecognizer:tap];
+    
     [view_content addSubview:sclView_top];
     
     for (int i = 0; i < [arr_topImgs count]; i++) {
@@ -163,11 +174,11 @@
         [view_imgTitle addSubview:lb_imgTitle];
         [sclView_top addSubview:imgView];
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
-        tap.numberOfTapsRequired = 1;
-        tap.numberOfTouchesRequired = 1;
-        tap.delegate = self;
-        [imgView addGestureRecognizer:tap];
+//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+//        tap.numberOfTapsRequired = 1;
+//        tap.numberOfTouchesRequired = 1;
+//        tap.delegate = self;
+//        [imgView addGestureRecognizer:tap];
         
         [arr_topImgs replaceObjectAtIndex:i withObject:dic_info];
     }
@@ -178,7 +189,7 @@
     con_page = [[UIPageControl alloc] initWithFrame:CGRectMake(0, 105, 320, 20)];
     con_page.currentPage = 0;
     con_page.backgroundColor = [UIColor clearColor];
-    [view_content addSubview:con_page];
+    //[view_content addSubview:con_page];
     
 //    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 160, 320, 30)];
 //    view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
@@ -237,6 +248,7 @@
     }
     
     [self.view bringSubviewToFront:indViewLarge];
+    [self.view bringSubviewToFront:view_nav];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -322,7 +334,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
-    NSLog(@"hotnews");
+    [arr_requests addObject:request];
 }
 
 -(NSString *)topImgRequestBody
@@ -360,6 +372,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)imgListRequestBody:(NSString *)direction
@@ -403,6 +416,9 @@
     {
         str_imgUrl = [info objectForKey:@"smallImgUrl"];
     }
+    if ([str_imgUrl length] == 0) {
+        return;
+    }
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_imgUrl]];
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:url];
@@ -424,6 +440,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 #pragma mark -
@@ -453,7 +470,7 @@
             NSLog(@"%@",[error localizedDescription]);
         }
         else {
-            [[SqlManager sharedManager] initImagesLastShow];
+            //[[SqlManager sharedManager] initImagesLastShow];
         }
         NSArray *arr_response = [xmlDoc nodesForXPath:@"//Response" error:&error];
         NSMutableArray *arr_total = [[NSMutableArray alloc] init];
@@ -506,23 +523,72 @@
                 }
                 else if(result == 103)
                 {
-                    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
-                    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
-                    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                    BOOL isExist = NO;
                     for (int i = 0; i < [arr_topImgs count]; i++) {
                         NSDictionary *dic_topImg = [arr_topImgs objectAtIndex:i];
-                        NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
-                        NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
-                        NSDate *date_current = [dateForm_time dateFromString:str_update];
-                        CustomImageView *imgView;
-                        if ([date_current compare:date_temp] == NSOrderedDescending || i == [arr_topImgs count] - 1) {
-                            imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 160) withID:str_id img:nil];
-//                            UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-//                            indView.tag = 101;
-//                            [indView setCenter:imgView.center];
-//                            [indView startAnimating];
-//                            [imgView addSubview:indView];
-                            
+                        NSString *str_tempId = [dic_topImg objectForKey:@"id"];
+                        if ([str_tempId isEqualToString:str_id] ) {
+                            isExist = YES;
+                            break;
+                        }
+                    }
+                    if (isExist == NO) {
+                        NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+                        [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+                        [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                        for (int i = 0; i < [arr_topImgs count]; i++) {
+                            NSDictionary *dic_topImg = [arr_topImgs objectAtIndex:i];
+                            NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
+                            NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
+                            NSDate *date_current = [dateForm_time dateFromString:str_update];
+                            CustomImageView *imgView;
+                            if ([date_current compare:date_temp] == NSOrderedDescending || i == [arr_topImgs count] - 1) {
+                                imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 160) withID:str_id img:nil];
+//                                UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+//                                tap.numberOfTapsRequired = 1;
+//                                tap.numberOfTouchesRequired = 1;
+//                                tap.delegate = self;
+//                                [imgView addGestureRecognizer:tap];
+                                
+                                
+                                //                            UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                                //                            indView.tag = 101;
+                                //                            [indView setCenter:imgView.center];
+                                //                            [indView startAnimating];
+                                //                            [imgView addSubview:indView];
+                                
+                                UIView *view_imgTitle = [[UIView alloc] initWithFrame:CGRectMake(0, 130, 320, 30)];
+                                view_imgTitle.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
+                                [imgView addSubview:view_imgTitle];
+                                
+                                UILabel *lb_imgTitle = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 310, 30)];
+                                lb_imgTitle.textColor = [UIColor whiteColor];
+                                lb_imgTitle.text = [NSString stringWithFormat:@"每日图片    %@",[dic_newInfo objectForKey:@"title"]];
+                                lb_imgTitle.backgroundColor = [UIColor clearColor];
+                                [view_imgTitle addSubview:lb_imgTitle];
+                                [sclView_top addSubview:imgView];
+                                
+                                [dic_newInfo setObject:imgView forKey:@"imgView"];
+                                if ([date_current compare:date_temp] == NSOrderedDescending) {
+                                    [arr_topImgs insertObject:dic_newInfo atIndex:i];
+                                }
+                                else if(i == [arr_topImgs count] - 1)
+                                {
+                                    [arr_topImgs addObject:dic_newInfo];
+                                }
+                                
+                                
+                                [self requestImage:dic_newInfo imgType:@"0"];
+                                break;
+                            }
+                        }
+                        if ([arr_topImgs count] == 0) {
+                            CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(320, 0, 320, 160) withID:str_id img:nil];
+                            //                        UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                            //                        indView.tag = 101;
+                            //                        [imgView addSubview:indView];
+                            //                        [indView startAnimating];
+                            //                        [indView setCenter:imgView.center];
                             UIView *view_imgTitle = [[UIView alloc] initWithFrame:CGRectMake(0, 130, 320, 30)];
                             view_imgTitle.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
                             [imgView addSubview:view_imgTitle];
@@ -534,63 +600,25 @@
                             [view_imgTitle addSubview:lb_imgTitle];
                             [sclView_top addSubview:imgView];
                             
-                            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
-                            tap.numberOfTapsRequired = 1;
-                            tap.numberOfTouchesRequired = 1;
-                            tap.delegate = self;
-                            [imgView addGestureRecognizer:tap];
+//                            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+//                            tap.numberOfTapsRequired = 1;
+//                            tap.numberOfTouchesRequired = 1;
+//                            tap.delegate = self;
+//                            [imgView addGestureRecognizer:tap];
                             
                             [dic_newInfo setObject:imgView forKey:@"imgView"];
-                            if ([date_current compare:date_temp] == NSOrderedDescending) {
-                                [arr_topImgs insertObject:dic_newInfo atIndex:i];
-                            }
-                            else if(i == [arr_topImgs count] - 1)
-                            {
-                                [arr_topImgs addObject:dic_newInfo];
-                            }
-                            
+                            [arr_topImgs addObject:dic_newInfo];
                             
                             [self requestImage:dic_newInfo imgType:@"0"];
-                            break;
                         }
-                    }
-                    if ([arr_topImgs count] == 0) {
-                        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(320, 0, 320, 160) withID:str_id img:nil];
-//                        UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-//                        indView.tag = 101;
-//                        [imgView addSubview:indView];
-//                        [indView startAnimating];
-//                        [indView setCenter:imgView.center];
-                        
-                        UIView *view_imgTitle = [[UIView alloc] initWithFrame:CGRectMake(0, 130, 320, 30)];
-                        view_imgTitle.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
-                        [imgView addSubview:view_imgTitle];
-                        
-                        UILabel *lb_imgTitle = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 310, 30)];
-                        lb_imgTitle.textColor = [UIColor whiteColor];
-                        lb_imgTitle.text = [NSString stringWithFormat:@"每日图片    %@",[dic_newInfo objectForKey:@"title"]];
-                        lb_imgTitle.backgroundColor = [UIColor clearColor];
-                        [view_imgTitle addSubview:lb_imgTitle];
-                        [sclView_top addSubview:imgView];
-                        
-                        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
-                        tap.numberOfTapsRequired = 1;
-                        tap.numberOfTouchesRequired = 1;
-                        tap.delegate = self;
-                        [imgView addGestureRecognizer:tap];
-                        
-                        [dic_newInfo setObject:imgView forKey:@"imgView"];
-                        [arr_topImgs addObject:dic_newInfo];
-                        
-                        [self requestImage:dic_newInfo imgType:@"0"];
-                    }
-                    NSLog(@"大图:%d",[arr_topImgs count]);
-                    con_page.numberOfPages = [arr_topImgs count];
-                    sclView_top.contentSize = CGSizeMake(320*[arr_topImgs count], 160);
-                    for (int i = 0; i < [arr_topImgs count]; i++) {
-                        NSDictionary *dic_topImg = [arr_topImgs objectAtIndex:i];
-                        CustomImageView *imgView = (CustomImageView *)[dic_topImg objectForKey:@"imgView"];
-                        imgView.frame = CGRectMake(320*i, 0, 320, 16);
+                        NSLog(@"大图:%d",[arr_topImgs count]);
+                        con_page.numberOfPages = [arr_topImgs count];
+                        sclView_top.contentSize = CGSizeMake(320*[arr_topImgs count], 160);
+                        for (int i = 0; i < [arr_topImgs count]; i++) {
+                            NSDictionary *dic_topImg = [arr_topImgs objectAtIndex:i];
+                            CustomImageView *imgView = (CustomImageView *)[dic_topImg objectForKey:@"imgView"];
+                            imgView.frame = CGRectMake(320*i, 0, 320, 16);
+                        }
                     }
                 }
             }
@@ -692,25 +720,63 @@
                 }
                 else if(result == 103)
                 {
-                    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
-                    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
-                    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                    BOOL isExist = NO;
                     for (int i = 0; i < [arr_imgList count]; i++) {
                         NSDictionary *dic_topImg = [arr_imgList objectAtIndex:i];
-                        NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
-                        NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
-                        NSDate *date_current = [dateForm_time dateFromString:str_update];
-                        CustomImageView *imgView;
-                        if ([date_current compare:date_temp] == NSOrderedDescending || i == [arr_imgList count] - 1) {
-                            int row = i/3;
-                            int col = i%3;
+                        NSString *str_tempId = [dic_topImg objectForKey:@"id"];
+                        if ([str_tempId isEqualToString:str_id] ) {
+                            isExist = YES;
+                            break;
+                        }
+                    }
+                    if (isExist == NO) {
+                        NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+                        [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+                        [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                        for (int i = 0; i < [arr_imgList count]; i++) {
+                            NSDictionary *dic_topImg = [arr_imgList objectAtIndex:i];
+                            NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
+                            NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
+                            NSDate *date_current = [dateForm_time dateFromString:str_update];
+                            CustomImageView *imgView;
+                            if ([date_current compare:date_temp] == NSOrderedDescending || i == [arr_imgList count] - 1) {
+                                int row = i/3;
+                                int col = i%3;
+                                
+                                imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5+105*col, 5+75*row, 100, 70) withID:str_id img:nil];
+                                //                            UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                                //                            [indView setCenter:imgView.center];
+                                //                            indView.tag = 101;
+                                //                            [indView startAnimating];
+                                //                            [imgView addSubview:indView];
+                                [sclView_imgList addSubview:imgView];
+                                
+                                UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+                                tap.numberOfTapsRequired = 1;
+                                tap.numberOfTouchesRequired = 1;
+                                tap.delegate = self;
+                                [imgView addGestureRecognizer:tap];
+                                
+                                [dic_newInfo setObject:imgView forKey:@"imgView"];
+                                if ([date_current compare:date_temp] == NSOrderedDescending) {
+                                    [arr_imgList insertObject:dic_newInfo atIndex:i];
+                                }
+                                else if (i == [arr_imgList count] - 1) {
+                                    [arr_imgList addObject:dic_newInfo];
+                                }
+                                
+                                [self requestImage:dic_newInfo imgType:@"1"];
+                                break;
+                            }
+                        }
+                        if ([arr_imgList count] == 0) {              
+                            CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5, 5, 100, 70) withID:str_id img:nil];
+                            //                        UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                            //                        [indView setCenter:imgView.center];
+                            //                        indView.tag = 101;
+                            //                        [indView startAnimating];
+                            //                        [imgView addSubview:indView];
                             
-                            imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5+105*col, 5+75*row, 100, 70) withID:str_id img:nil];
-//                            UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-//                            [indView setCenter:imgView.center];
-//                            indView.tag = 101;
-//                            [indView startAnimating];
-//                            [imgView addSubview:indView];
                             [sclView_imgList addSubview:imgView];
                             
                             UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
@@ -720,46 +786,19 @@
                             [imgView addGestureRecognizer:tap];
                             
                             [dic_newInfo setObject:imgView forKey:@"imgView"];
-                            if ([date_current compare:date_temp] == NSOrderedDescending) {
-                                [arr_imgList insertObject:dic_newInfo atIndex:i];
-                            }
-                            else if (i == [arr_imgList count] - 1) {
-                                [arr_imgList addObject:dic_newInfo];
-                            }
+                            [arr_imgList addObject:dic_newInfo];
                             
                             [self requestImage:dic_newInfo imgType:@"1"];
-                            break;
                         }
-                    }
-                    if ([arr_imgList count] == 0) {              
-                        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5, 5, 100, 70) withID:str_id img:nil];
-//                        UIActivityIndicatorView *indView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-//                        [indView setCenter:imgView.center];
-//                        indView.tag = 101;
-//                        [indView startAnimating];
-//                        [imgView addSubview:indView];
-                        
-                        [sclView_imgList addSubview:imgView];
-                        
-                        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
-                        tap.numberOfTapsRequired = 1;
-                        tap.numberOfTouchesRequired = 1;
-                        tap.delegate = self;
-                        [imgView addGestureRecognizer:tap];
-                        
-                        [dic_newInfo setObject:imgView forKey:@"imgView"];
-                        [arr_imgList addObject:dic_newInfo];
-                        
-                        [self requestImage:dic_newInfo imgType:@"1"];
-                    }
-                    int rows = [arr_imgList count]/3;
-                    sclView_imgList.contentSize = CGSizeMake(320, 5+75*(rows+1));
-                    for (int i = 0; i < [arr_imgList count]; i++) {
-                        NSDictionary *dic_topImg = [arr_imgList objectAtIndex:i];
-                        CustomImageView *imgView = (CustomImageView *)[dic_topImg objectForKey:@"imgView"];
-                        int row = i/3;
-                        int col = i%3;
-                        imgView.frame = CGRectMake(5+105*col, 5+75*row, 100, 70);
+                        int rows = [arr_imgList count]/3;
+                        sclView_imgList.contentSize = CGSizeMake(320, 5+75*(rows+1));
+                        for (int i = 0; i < [arr_imgList count]; i++) {
+                            NSDictionary *dic_topImg = [arr_imgList objectAtIndex:i];
+                            CustomImageView *imgView = (CustomImageView *)[dic_topImg objectForKey:@"imgView"];
+                            int row = i/3;
+                            int col = i%3;
+                            imgView.frame = CGRectMake(5+105*col, 5+75*row, 100, 70);
+                        }
                     }
                 }
             }
@@ -814,6 +853,7 @@
         NSString *str_imgType = [dic_userInfo objectForKey:@"imgType"];
         NSString *str_id = [dic_userInfo objectForKey:@"id"];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/Caches/Image/%@",str_fileName]];
@@ -879,22 +919,39 @@
     }
 }
 
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
+}
+
 #pragma mark -
 #pragma mark UIGestureRecognizer
+-(void)tapLargeImage:(id)sender
+{
+    UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
+//    CustomImageView *view = (CustomImageView *)tap.view;
+//    NSLog(@"CustomImageView:%@",view.str_id);
+    int index = [tap locationInView:tap.view].x/320;
+    if ([arr_topImgs count] >= index +1) {
+        NSMutableDictionary *dic_news = [arr_topImgs objectAtIndex:index];
+        ImageDetailViewController *con_detail = [[ImageDetailViewController alloc] init];
+        con_detail.str_id = [dic_news objectForKey:@"id"];
+    
+        [self.navigationController pushViewController:con_detail animated:YES]; 
+    }
+}
+
 -(void)tapImage:(id)sender
 {
     UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
-    CustomImageView *view = (CustomImageView *)tap.view;
-    NSLog(@"CustomImageView:%@",view.str_id);
-//    int index = [tap locationInView:tap.view].x/320;
-//    if ([arr_topImgs count] >= index +1) {
-//        NSMutableDictionary *dic_news = [arr_topImgs objectAtIndex:index];
+    CustomImageView *imgView = (CustomImageView *)tap.view;
     ImageDetailViewController *con_detail = [[ImageDetailViewController alloc] init];
-    
-    con_detail.str_id = view.str_id;
-    
-    [self.navigationController pushViewController:con_detail animated:YES]; 
-//    }
+    con_detail.str_id = imgView.str_id;
+    [self.navigationController pushViewController:con_detail animated:YES];
 }
 
 
@@ -928,19 +985,20 @@
 
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView 
 {
-    if (scrollView.contentOffset.y + scrollView.frame.size.height == scrollView.contentSize.height) {
-        if (isGettingBefore == NO) {
-            [self requestImgList:@"before"];
-            isGettingBefore = YES;
+    if (scrollView == sclView_imgList) {
+        if (scrollView.contentOffset.y + scrollView.frame.size.height == scrollView.contentSize.height) {
+            if (isGettingBefore == NO) {
+                [self requestImgList:@"before"];
+                isGettingBefore = YES;
+            }
+        }
+        else if (scrollView.contentOffset.y == 0) {
+            if (isGettingLater == NO) {
+                [self requestImgList:@"later"];
+                isGettingLater = YES;
+            }
         }
     }
-    else if (scrollView.contentOffset.y == 0) {
-        if (isGettingLater == NO) {
-            [self requestImgList:@"later"];
-            isGettingLater = YES;
-        }
-    }
-    
 }
 
 @end

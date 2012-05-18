@@ -35,6 +35,11 @@
     BOOL isGettingLater;
     
     UIActivityIndicatorView *indViewLarge;
+    
+    NSMutableArray *arr_requests;
+    
+    UIView *view_loadingAtTop;
+    UIView *view_loadingAtBottom;
 }
 
 @end

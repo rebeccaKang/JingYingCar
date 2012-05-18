@@ -15,6 +15,7 @@
 #import "ImageDetailViewController.h"
 #import "SearchViewController.h"
 #import "SettingViewController.h"
+#import "CustomImageView.h"
 
 #define DEFAULT_URL @"http://classic.wangfan.com/default.ashx"
 #define BASIC_URL @"http://classic.wangfan.com"
@@ -37,6 +38,8 @@
     NSInteger bufferTime;
     
     NSMutableArray *arr_shouldRequest;
+    
+    NSMutableArray *arr_requests;
 }
 
 @property (strong, nonatomic) UIWindow *window;

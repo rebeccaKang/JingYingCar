@@ -28,6 +28,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+        self.userInteractionEnabled = YES;
         str_id = strID;
         imgView = [[UIImageView alloc] initWithFrame:self.bounds];
         imgView.backgroundColor = [UIColor grayColor];

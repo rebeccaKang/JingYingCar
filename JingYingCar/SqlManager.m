@@ -129,7 +129,7 @@
 {
     [lock lock];
     NSMutableArray *arr_result = [[NSMutableArray alloc] init];
-    NSString *str_sqlOrder = @"select HN_createTime,HN_title,HN_summary,HN_class,HN_smallImgUrl,HN_largeImgUrl,HN_smallImgAddress,HN_largeImgAddress,HN_otherID,HN_isLastShow from tbl_hotNews order by HN_createTime desc";
+    NSString *str_sqlOrder = @"select HN_createTime,HN_title,HN_summary,HN_class,HN_smallImgUrl,HN_largeImgUrl,HN_smallImgAddress,HN_largeImgAddress,HN_otherID,HN_isLastShow from tbl_hotNews where HN_isEnabled = '0' order by HN_createTime desc";
     NSLog(@"str_sqlOrder:%@",str_sqlOrder);
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
@@ -276,6 +276,7 @@
 -(NSInteger)saveHotNewsListInfo:(NSDictionary *)dic_info isTopOrList:(NSString *)type
 {
     [lock lock];
+    NSLog(@"type:%@",type);
 	NSDate *time = [NSDate date];
 	NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
 	[dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
@@ -292,7 +293,7 @@
     NSString *str_createTime = [dic_info objectForKey:@"createTime"];
     NSString *str_sImgUrl = [dic_info objectForKey:@"smallImgUrl"];
     NSString *str_lImgUrl = [dic_info objectForKey:@"largeImgUrl"];
-    str_sqlOrder = [NSString stringWithFormat:@"select HN_createTime,HN_title,HN_summary,HN_class,HN_smallImgUrl,HN_largeImgUrl,HN_isLastShow from tbl_hotNews where HN_otherID = '%@' order by HN_createTime desc",str_id];
+    str_sqlOrder = [NSString stringWithFormat:@"select HN_createTime,HN_isEnabled from tbl_hotNews where HN_otherID = '%@' order by HN_createTime desc",str_id];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -300,22 +301,28 @@
     if (code == SQLITE_ROW) {
         NSString *str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
         if ([str_detail isEqualToString:str_createTime]) {
-            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_isLastShow = '1' where HN_otherID = '%@'",str_id];
-            char_sqlOrder = (char *)[str_sqlOrder UTF8String];
-            result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
-            if(result != SQLITE_OK){
-                NSLog(@"saveNewsList,Failed to update,errorCode:%d",result);
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            if ([str_detail isEqualToString:@"0"]) {
+                result = 101;
             }
             else {
-                result = 101;
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_isEnabled = '0',HN_isLastShow = '%d' where HN_otherID = '%@'",abs([type intValue]-1),str_id];
+                char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+                result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+                if(result != SQLITE_OK){
+                    NSLog(@"saveNewsList,Failed to update,errorCode:%d",result);
+                }
+                else {
+                    result = 103;
+                }
             }
         }
         else {
             if ([type isEqualToString:@"0"]) {
-                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_createTime = '%@',HN_title = '%@',HN_summary = '%@',HN_class = '%@',HN_smallImgUrl = '%@',HN_largeImgUrl = '%@',HN_isReaded = '0',HN_isLastShow = '1' where HN_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_sImgUrl,str_lImgUrl ,str_id];
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_createTime = '%@',HN_title = '%@',HN_summary = '%@',HN_class = '%@',HN_smallImgUrl = '%@',HN_largeImgUrl = '%@',HN_isReaded = '0',HN_isLastShow = '1',HN_isEnabled = '0' where HN_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_sImgUrl,str_lImgUrl ,str_id];
             }
             else {
-                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_createTime = '%@',HN_title = '%@',HN_summary = '%@',HN_class = '%@',HN_smallImgUrl = '%@',HN_largeImgUrl = '%@',HN_isReaded = '0',HN_isLastShow = '0' where HN_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_sImgUrl,str_lImgUrl ,str_id];
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_createTime = '%@',HN_title = '%@',HN_summary = '%@',HN_class = '%@',HN_smallImgUrl = '%@',HN_largeImgUrl = '%@',HN_isReaded = '0',HN_isLastShow = '0',HN_isEnabled = '0' where HN_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_sImgUrl,str_lImgUrl ,str_id];
             }
             char_sqlOrder = (char *)[str_sqlOrder UTF8String];
             result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
@@ -543,7 +550,7 @@
         }
     }
     sqlite3_finalize(stmt);
-    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_smallImgAddress = '',HN_largeImgAddress = '',HN_isReaded = '0',HN_contentImgAddress = '',HN_isLastShow = '1',HN_isEnabled = '1' where HN_otherID = '%@'",str_id];
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_smallImgAddress = '',HN_largeImgAddress = '',HN_isReaded = '0',HN_contentImgAddress = '',HN_isEnabled = '1' where HN_otherID = '%@'",str_id];
     char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
     result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
     if(result != SQLITE_OK){
@@ -561,7 +568,7 @@
 {
     [lock lock];
     NSMutableArray *arr_result = [[NSMutableArray alloc] init];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_isLastShow,IMG_title,IMG_createTime,IMG_smallImgAddress,IMG_largeImgAddress,IMG_smallImgUrl,IMG_largeImgUrl,IMG_summary,IMG_otherID from tbl_images order by IMG_createTime desc"];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_isLastShow,IMG_title,IMG_createTime,IMG_smallImgAddress,IMG_largeImgAddress,IMG_smallImgUrl,IMG_largeImgUrl,IMG_summary,IMG_otherID from tbl_images where IMG_isEnabled = '0' order by IMG_createTime desc"];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -607,7 +614,7 @@
 {
     [lock lock];
     NSMutableArray *arr_result = [[NSMutableArray alloc] init];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_isLastShow,IMG_title,IMG_createTime,IMG_smallImgAddress,IMG_largeImgAddress,IMG_smallImgUrl,IMG_largeImgUrl,IMG_summary,IMG_otherID from tbl_images order by IMG_createTime desc"];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_isLastShow,IMG_title,IMG_createTime,IMG_smallImgAddress,IMG_largeImgAddress,IMG_smallImgUrl,IMG_largeImgUrl,IMG_summary,IMG_otherID from tbl_images where IMG_isEnabled = '0' order by IMG_createTime desc"];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -780,7 +787,7 @@
     NSString *str_createTime = [dic_info objectForKey:@"createTime"];
     NSString *str_sImgUrl = [dic_info objectForKey:@"smallImgUrl"];
     NSString *str_lImgUrl = [dic_info objectForKey:@"largeImgUrl"];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_createTime from tbl_images where IMG_otherID = '%@'",str_id];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IMG_createTime,IMG_isEnabled from tbl_images where IMG_otherID = '%@'",str_id];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -788,23 +795,30 @@
     if (code == SQLITE_ROW) {
         NSString *str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
         if ([str_detail isEqualToString:str_createTime]) {
-            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_isLastShow = '1' where IMG_otherID = '%@'",str_id];
-            
-            char_sqlOrder = (char *)[str_sqlOrder UTF8String];
-            result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
-            if(result != SQLITE_OK){
-                NSLog(@"saveNewsList,Failed to update,errorCode:%d",result);
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            if ([str_detail isEqualToString:@"1"]) {
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_isEnabled = '0',IMG_isLastShow = '%d' where IMG_otherID = '%@'",abs([type intValue] -1),str_id];
+                
+                char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+                result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+                if(result != SQLITE_OK){
+                    NSLog(@"saveNewsList,Failed to update,errorCode:%d",result);
+                }
+                else {
+                    result = 103;
+                }
             }
             else {
                 result = 101;
             }
+            
         }
         else {
             if ([type isEqualToString:@"0"]) {
-                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_createTime = '%@',IMG_title = '%@',IMG_summary = '%@',IMG_smallImgUrl = '%@',IMG_largeImgUrl = '%@',IMG_isReaded = '0',IMG_isLastShow = '1',IMG_smallImgAddress = '',IMG_largeImgAddress = '' where IMG_otherID = '%@'",str_createTime,str_title,str_summary,str_sImgUrl,str_lImgUrl ,str_id];
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_createTime = '%@',IMG_title = '%@',IMG_summary = '%@',IMG_smallImgUrl = '%@',IMG_largeImgUrl = '%@',IMG_isReaded = '0',IMG_isLastShow = '1',IMG_smallImgAddress = '',IMG_largeImgAddress = '',IMG_isEnabled = '0' where IMG_otherID = '%@'",str_createTime,str_title,str_summary,str_sImgUrl,str_lImgUrl ,str_id];
             }
             else {
-                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_createTime = '%@',IMG_title = '%@',IMG_summary = '%@',IMG_smallImgUrl = '%@',IMG_largeImgUrl = '%@',IMG_isReaded = '0',IMG_isLastShow = '0',IMG_smallImgAddress = '',IMG_largeImgAddress = '' where IMG_otherID = '%@'",str_createTime,str_title,str_summary,str_sImgUrl,str_lImgUrl ,str_id];
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_createTime = '%@',IMG_title = '%@',IMG_summary = '%@',IMG_smallImgUrl = '%@',IMG_largeImgUrl = '%@',IMG_isReaded = '0',IMG_isLastShow = '0',IMG_smallImgAddress = '',IMG_largeImgAddress = '',IMG_isEnabled = '0' where IMG_otherID = '%@'",str_createTime,str_title,str_summary,str_sImgUrl,str_lImgUrl ,str_id];
             }
             
             char_sqlOrder = (char *)[str_sqlOrder UTF8String];
@@ -960,13 +974,13 @@
     NSString *str_contentDetail = [dic_info objectForKey:@"contentDetail"];
     NSString *str_largeImgUrl = [dic_info objectForKey:@"largeImgUrl"];
     NSString *str_imgID = [dic_info objectForKey:@"imgID"];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select * from tbl_imagesSeries where IS_otherID = '%@' and IS_imgID = '%@'",str_id,str_imgID];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select IS_isEnabled from tbl_imagesSeries where IS_otherID = '%@' and IS_imgID = '%@'",str_id,str_imgID];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
     int code = sqlite3_step(stmt);
     if (code == SQLITE_ROW) {
-        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_contentTitle = '%@',IS_smallImgUrl = '%@',IS_largeImgUrl = '%@',IS_contentDetail = '%@',IS_smallImgAddress = '',IS_largeImgAddress = '' where IS_otherID = '%@' and IS_imgID = '%@'",str_contentTitle,str_smallImgUrl,str_contentDetail,str_largeImgUrl ,str_id,str_imgID];
+        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_contentTitle = '%@',IS_smallImgUrl = '%@',IS_largeImgUrl = '%@',IS_contentDetail = '%@',IS_smallImgAddress = '',IS_largeImgAddress = '',IS_isEnabled = '0' where IS_otherID = '%@' and IS_imgID = '%@'",str_contentTitle,str_smallImgUrl,str_largeImgUrl,str_largeImgUrl,str_contentDetail ,str_id,str_imgID];
         char_sqlOrder = (char *)[str_sqlOrder UTF8String];
         result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
         if(result != SQLITE_OK){
@@ -1068,10 +1082,10 @@
     char *merror = nil;
     NSString *str_sqlOrder;
     if (imgType == 0) {
-        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_largeImgAddress = '%@' where IS_otherID = '%@' and IS_imgID = '%@'",imgAddress ,str_id,str_imgID];
+        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_largeImgAddress = '%@',IS_isEnabled = '0' where IS_otherID = '%@' and IS_imgID = '%@'",imgAddress ,str_id,str_imgID];
     }
-    if (imgType == 1) {
-        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_smallImgAddress = '%@' where IS_otherID = '%@' and IS_imgID = '%@'",imgAddress ,str_id,str_imgID];
+    else if (imgType == 1) {
+        str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_smallImgAddress = '%@',IS_isEnabled = '0' where IS_otherID = '%@' and IS_imgID = '%@'",imgAddress ,str_id,str_imgID];
     }
     char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
     result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
@@ -1109,8 +1123,7 @@
             [fileManager removeItemAtPath:str_detail error:&error];
         }
     }
-    sqlite3_finalize(stmt);
-    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_hotNews SET HN_smallImgAddress = '',HN_largeImgAddress = '',HN_isReaded = '0',HN_contentImgAddress = '',HN_isLastShow = '1',HN_isEnabled = '1' where HN_otherID = '%@'",str_id];
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_images SET IMG_smallImgAddress = '',IMG_largeImgAddress = '',IMG_isReaded = '0',IMG_isEnabled = '1' where IMG_otherID = '%@'",str_id];
     char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
     result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
     if(result != SQLITE_OK){
@@ -1118,7 +1131,7 @@
         NSLog(@"%@",str_sqlOrder);
     }
     
-    str_sqlOrder = [NSString stringWithFormat:@"select IS_smallImgAddress,IMG_largeImgAddress from tbl_imagesSeries where IS_otherID = '%@'",str_id];
+    str_sqlOrder = [NSString stringWithFormat:@"select IS_smallImgAddress,IS_largeImgAddress from tbl_imagesSeries where IS_otherID = '%@'",str_id];
     sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
     code = sqlite3_step(stmt);
@@ -1133,9 +1146,11 @@
         if ([str_detail length] > 0) {
             [fileManager removeItemAtPath:str_detail error:&error];
         }
+        code = sqlite3_step(stmt);
     }
     sqlite3_finalize(stmt);
     str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_imagesSeries SET IS_smallImgAddress = '',IS_largeImgAddress = '',IS_isEnabled = '1' where IS_otherID = '%@'",str_id];
+    NSLog(@"delete image:%@",str_sqlOrder);
     char_sqlOrder = (char *)[str_sqlOrder UTF8String];
     result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
     if(result != SQLITE_OK){
@@ -1153,7 +1168,7 @@
 {
     [lock lock];
     NSMutableArray *arr_result = [[NSMutableArray alloc] init];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select TPC_title,TPC_class,TPC_createTime,TPC_imgAddress,TPC_summary,TPC_otherID,TPC_isReaded,TPC_imgUrl,TPC_fatherID from tbl_topic where TPC_isLastShow = '1' order by TPC_createTime desc"];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select TPC_title,TPC_class,TPC_createTime,TPC_imgAddress,TPC_summary,TPC_otherID,TPC_isReaded,TPC_imgUrl,TPC_fatherID from tbl_topic where TPC_isEnabled = '0' order by TPC_createTime desc"];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -1348,27 +1363,32 @@
     NSString *str_createTime = [dic_info objectForKey:@"createTime"];
     NSString *str_imgUrl = [dic_info objectForKey:@"smallImgUrl"];
     NSString *str_fatherID = [dic_info objectForKey:@"fatherID"];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select TPC_createTime from tbl_topic where TPC_otherID = '%@'",str_id];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select TPC_createTime,TPC_isEnabled from tbl_topic where TPC_otherID = '%@'",str_id];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
     int code = sqlite3_step(stmt);
     if (code == SQLITE_ROW) {
         NSString *str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
-        sqlite3_finalize(stmt);
         if ([str_detail isEqualToString:str_createTime]) {
-            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_isLastShow = '1' where TPC_otherID = '%@'",str_id];
-            char_sqlOrder = (char *)[str_sqlOrder UTF8String];
-            result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
-            if(result != SQLITE_OK){
-                NSLog(@"saveTopicList,Failed to update,errorCode:%d,%@",result,str_sqlOrder);
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            if ([str_detail isEqualToString:@"1"]) {
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_isEnabled = '0' where TPC_otherID = '%@'",str_id];
+                char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+                result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+                if(result != SQLITE_OK){
+                    NSLog(@"saveTopicList,Failed to update,errorCode:%d,%@",result,str_sqlOrder);
+                }
+                else {
+                    result = 103;
+                }
             }
             else {
                 result = 101;
             }
         }
         else {
-            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_createTime = '%@',TPC_title = '%@',TPC_summary = '%@',TPC_class = '%@',TPC_imgUrl = '%@',TPC_fatherID = '%@',TPC_shouldRefresh = '0',TPC_isReaded = '0',TPC_isLastShow = '1' where TPC_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_imgUrl ,str_fatherID,str_id];
+            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_createTime = '%@',TPC_title = '%@',TPC_summary = '%@',TPC_class = '%@',TPC_imgUrl = '%@',TPC_fatherID = '%@',TPC_shouldRefresh = '0',TPC_isReaded = '0',TPC_isLastShow = '1',TPC_isEnabled = '0' where TPC_otherID = '%@'",str_createTime,str_title,str_summary,str_class,str_imgUrl ,str_fatherID,str_id];
             char_sqlOrder = (char *)[str_sqlOrder UTF8String];
             result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
             if(result != SQLITE_OK){
@@ -1378,6 +1398,7 @@
                 result = 102;
             }
         }
+        sqlite3_finalize(stmt);
     }
     else
     {
@@ -1570,7 +1591,7 @@
         }
     }
     sqlite3_finalize(stmt);
-    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_imgAddress = '',TPC_isReaded = '0',TPC_contentImgAddress = '',TPC_isLastShow = '1',TPC_isEnabled = '1' where TPC_otherID = '%@'",str_id];
+    str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_topic SET TPC_imgAddress = '',TPC_isReaded = '0',TPC_contentImgAddress = '',TPC_isEnabled = '1' where TPC_otherID = '%@'",str_id];
     char *char_sqlOrder = (char *)[str_sqlOrder UTF8String];
     result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
     if(result != SQLITE_OK){
@@ -1764,7 +1785,7 @@
     NSString *str_imgUrl = [dic_info objectForKey:@"coverImgUrl"];
     NSString *str_url = [dic_info objectForKey:@"url"];
     NSString *str_summary = [dic_info objectForKey:@"summary"];
-    NSString *str_sqlOrder = [NSString stringWithFormat:@"select MGZ_createTime from tbl_magazine where MGZ_otherID = '%@' and MGZ_isEnabled = '0'",str_id];
+    NSString *str_sqlOrder = [NSString stringWithFormat:@"select MGZ_createTime,MGZ_isEnabled from tbl_magazine where MGZ_otherID = '%@'",str_id];
     char *sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
@@ -1773,10 +1794,24 @@
     if (code == SQLITE_ROW) {
         str_detail = [self charToString:sqlite3_column_text(stmt, 0)];
         if ([str_detail isEqualToString:str_createTime]) {
-            result = 101;
+            str_detail = [self charToString:sqlite3_column_text(stmt, 1)];
+            if ([str_detail isEqualToString:@"1"]) {
+                str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_magazine SET MGZ_isReaded = '0',MGZ_isEnabled = '0' where MGZ_otherID = '%@'",str_createTime,str_title,str_summary,str_imgUrl ,str_url,str_id];
+                char_sqlOrder = (char *)[str_sqlOrder UTF8String];
+                result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
+                if(result != SQLITE_OK){
+                    NSLog(@"saveMagazineItem,Failed to update,errorCode:%d,%@",result,str_sqlOrder);
+                }
+                else {
+                    result = 103;
+                }
+            }
+            else {
+                result = 101;
+            }
         }
         else {
-            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_magazine SET MGZ_createTime = '%@',MGZ_title = '%@',MGZ_summary = '%@',MGZ_coverImgUrl = '%@',MGZ_url = '%@',MGZ_isReaded = '0',MGZ_coverImgAddress = '',MGZ_address = '' where MGZ_otherID = '%@'",str_createTime,str_title,str_summary,str_imgUrl ,str_url,str_id];
+            str_sqlOrder = [NSString stringWithFormat:@"UPDATE tbl_magazine SET MGZ_createTime = '%@',MGZ_title = '%@',MGZ_summary = '%@',MGZ_coverImgUrl = '%@',MGZ_url = '%@',MGZ_isReaded = '0',MGZ_coverImgAddress = '',MGZ_address = '',MGZ_isEnabled = '0' where MGZ_otherID = '%@'",str_createTime,str_title,str_summary,str_imgUrl ,str_url,str_id];
             char_sqlOrder = (char *)[str_sqlOrder UTF8String];
             result = sqlite3_exec(database, char_sqlOrder, 0, 0,&merror);
             if(result != SQLITE_OK){
@@ -2136,10 +2171,18 @@
         code = sqlite3_step(stmt);
     }
     sqlite3_finalize(stmt);
+    NSLog(@"deleteHN:%@",arr_item);
     [lock unlock];
     for (int i = 0; i < [arr_item count]; i++) {
         NSString *str_id = [arr_item objectAtIndex:i];
-        [self deleteHotNews:str_id];
+        str_sqlOrder = [NSString stringWithFormat:@"select MC_otherID from tbl_collection where MC_otherID = '%@'",str_id];
+        sql = (char *)[str_sqlOrder UTF8String];
+        sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+        code = sqlite3_step(stmt);
+        if (code == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            [self deleteHotNews:str_id];
+        }
     }
     [arr_item removeAllObjects];
     [lock lock];
@@ -2157,15 +2200,23 @@
         }
         code = sqlite3_step(stmt);
     }
+    NSLog(@"deleteTPC:%@",arr_item);
     sqlite3_finalize(stmt);
     [lock unlock];
     for (int i = 0; i < [arr_item count]; i++) {
         NSString *str_id = [arr_item objectAtIndex:i];
-        [self deleteTopic:str_id];
+        str_sqlOrder = [NSString stringWithFormat:@"select MC_otherID from tbl_collection where MC_otherID = '%@'",str_id];
+        sql = (char *)[str_sqlOrder UTF8String];
+        sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+        code = sqlite3_step(stmt);
+        if (code == SQLITE_ROW) {
+            sqlite3_finalize(stmt);
+            [self deleteTopic:str_id];
+        }
     }
     [arr_item removeAllObjects];
     [lock lock];
-    str_sqlOrder = @"select IMG_createTime,IMG_otherID from tbl_hotNews where IMG_isEnabled = '0' order by IMG_createTime";
+    str_sqlOrder = @"select IMG_createTime,IMG_otherID from tbl_images where IMG_isEnabled = '0' order by IMG_createTime";
     sql = (char *)[str_sqlOrder UTF8String];
     sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
     code = sqlite3_step(stmt);
@@ -2181,10 +2232,12 @@
     }
     sqlite3_finalize(stmt);
     [lock unlock];
+     NSLog(@"deleteImg:%@",arr_item);
     for (int i = 0; i < [arr_item count]; i++) {
         NSString *str_id = [arr_item objectAtIndex:i];
         [self deleteImage:str_id];
     }
+    NSLog(@"emptyBuffer");
 }
 
 @end

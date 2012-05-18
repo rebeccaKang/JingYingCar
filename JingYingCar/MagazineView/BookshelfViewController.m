@@ -31,6 +31,7 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     
+    arr_requests = [[NSMutableArray alloc] init];
     arr_magazine = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getMagazineList]];
     //arr_magzine = [[NSMutableArray alloc] init];
     [self requestMagazineList];
@@ -43,6 +44,9 @@
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.layer.shadowOffset = CGSizeMake(0, 1);
+    view_nav.layer.shadowOpacity = 1;
+    view_nav.layer.shadowColor = [UIColor blackColor].CGColor;
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -78,6 +82,8 @@
     [view_content addSubview:imgView_background];
     
     arr_buttons = [[NSMutableArray alloc] init];
+    
+    [self.view bringSubviewToFront:view_nav];
     
 //    for (int i = 0; i < 13; i++) {
 //        UIButton *btn_magzine = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -128,7 +134,7 @@
         [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
         int row = i/4;
         int col = i%4;
-        btn_magazine.frame = CGRectMake(10+80*col, 10+93*row, 50, 60);
+        btn_magazine.frame = CGRectMake(28+73*col, 10+93*row, 45, 65);
         UIImage *img;
         NSString *str_address = [dic_newInfo objectForKey:@"address"];
         NSString *str_imgAddress = [dic_newInfo objectForKey:@"coverImgAddress"];
@@ -238,6 +244,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)magazineListRequestBody
@@ -272,6 +279,16 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 #pragma mark -
@@ -424,6 +441,7 @@
         UIImage *image = [[UIImage alloc] initWithData:request.responseData];
         NSString *str_id = [dic_userInfo objectForKey:@"id"];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/Caches/Magazine/%@",str_fileName]];

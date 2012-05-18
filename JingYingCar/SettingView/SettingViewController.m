@@ -38,6 +38,9 @@
     self.view.backgroundColor = [UIColor clearColor];
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.layer.shadowOffset = CGSizeMake(0, 1);
+    view_nav.layer.shadowOpacity = 1;
+    view_nav.layer.shadowColor = [UIColor blackColor].CGColor;
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -56,8 +59,8 @@
     
     UIButton *btn_finish = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_finish.frame = CGRectMake(210, 8, 100, 30);
-    [btn_finish setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
-    [btn_finish setTitle:@"完成" forState:UIControlStateNormal];
+    [btn_finish setBackgroundImage:[UIImage imageNamed:@"settingFinish.png"] forState:UIControlStateNormal];
+    //[btn_finish setTitle:@"完成" forState:UIControlStateNormal];
     [btn_finish addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_finish setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btn_finish.titleLabel.font = [UIFont boldSystemFontOfSize:17];
@@ -74,7 +77,25 @@
     tbl_setting.dataSource = self;
     [view_content addSubview:tbl_setting];
     
+    UIButton *btn_attention = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn_attention setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
+    [btn_attention setTitle:@"关注新浪微博" forState:UIControlStateNormal];
+    btn_attention.titleLabel.font = [UIFont boldSystemFontOfSize:12];
+    btn_attention.frame = CGRectMake(80, 325, 160, 30);
+    [view_content addSubview:btn_attention];
+    
+    UILabel *lb_copyRight = [[UILabel alloc] initWithFrame:CGRectMake(30, 365, 260, 40)];
+    lb_copyRight.font = [UIFont boldSystemFontOfSize:12];
+    lb_copyRight.textAlignment = UITextAlignmentCenter;
+    lb_copyRight.backgroundColor = [UIColor clearColor];
+    lb_copyRight.lineBreakMode = UILineBreakModeCharacterWrap;
+    lb_copyRight.numberOfLines = 2;
+    lb_copyRight.text = @"Copyright © 2012 上海菁英广告传播有限公司. All Right Reserved";
+    [view_content addSubview:lb_copyRight];
+    
     arr_time = [NSArray arrayWithObjects:@"不缓存",@"一天",@"一周",@"一个月",@"永久", nil];
+    
+    [self.view bringSubviewToFront:view_nav];
 }
 
 - (void)viewDidLoad
@@ -117,7 +138,7 @@
 //    transition.delegate = self;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    [[SqlManager sharedManager] emptyBuffer:app.bufferTime];
+    //[[SqlManager sharedManager] emptyBuffer:app.bufferTime];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

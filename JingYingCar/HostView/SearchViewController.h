@@ -18,6 +18,8 @@
     NSMutableArray *arr_result;
     
     UIActivityIndicatorView *indViewLarge;
+    
+    NSMutableArray *arr_requests;
 }
 
 @end

@@ -82,4 +82,8 @@
 -(void)initImagesLastShow;
 -(void)initTopicLastShow;
 
+-(void)deleteHotNews:(NSString *)str_id;
+-(void)deleteTopic:(NSString *)str_id;
+-(void)deleteImage:(NSString *)str_id;
+
 @end

@@ -30,6 +30,8 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     [super loadView];
+    arr_requests = [[NSMutableArray alloc] init];
+    
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
@@ -39,7 +41,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7, 50, 30);
+    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
     [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
@@ -135,6 +137,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(void)readMagazine:(UIButton *)sender
@@ -223,6 +226,7 @@
         [btn_download setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
         [btn_download setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [btn_download setTitle:@"下载" forState:UIControlStateNormal];
+        btn_download.titleLabel.font = [UIFont boldSystemFontOfSize:14];
         btn_download.tag = 5;
         [btn_download addTarget:self action:@selector(downloadMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_download];
@@ -232,6 +236,7 @@
         [btn_read setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
         [btn_read setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [btn_read setTitle:@"阅读" forState:UIControlStateNormal];
+        btn_read.titleLabel.font = [UIFont boldSystemFontOfSize:14];
         btn_read.tag = 6;
         [btn_read addTarget:self action:@selector(readMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_read];
@@ -474,6 +479,14 @@
     //    [alertView show];
 }
 
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
+}
 
 @end
 

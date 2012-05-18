@@ -31,7 +31,7 @@
     [super loadView];
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
-    
+    arr_requests = [[NSMutableArray alloc] init];
     arr_imgList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getImagesSeriesWithID:str_id]];
     NSDictionary *dic_info = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getImageListWithID:str_id] copyItems:YES];
     
@@ -44,7 +44,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7, 50, 30);
+    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
     [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
@@ -63,7 +63,7 @@
     [self.view addSubview:sclView_item];
     
     sclView_imgList = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-    sclView_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    sclView_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
     sclView_imgList.delegate = self;
     sclView_imgList.directionalLockEnabled = YES;
     [self.view addSubview:sclView_imgList];
@@ -72,32 +72,34 @@
     view_topBar.backgroundColor = [UIColor colorWithWhite:0.5f alpha:0.5f];
     [sclView_imgList addSubview:view_topBar];
     
-    UILabel *lb_topBarTitle = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 220, 45)];
+    UILabel *lb_topBarTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     lb_topBarTitle.backgroundColor = [UIColor clearColor];
     lb_topBarTitle.textColor = [UIColor whiteColor];
     lb_topBarTitle.textAlignment = UITextAlignmentLeft;
     lb_topBarTitle.text = [dic_info objectForKey:@"title"];
     lb_topBarTitle.font = [UIFont boldSystemFontOfSize:17];
+    lb_topBarTitle.textAlignment = UITextAlignmentCenter;
     [view_topBar addSubview:lb_topBarTitle];
     
     UIButton *btn_topBarBack = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_topBarBack.frame = CGRectMake(230, 7, 80, 30);
-    [btn_topBarBack setBackgroundImage:[UIImage imageNamed:@"rectButton.png"] forState:UIControlStateNormal];
-    [btn_topBarBack setTitle:@"返回" forState:UIControlStateNormal];
+    btn_topBarBack.frame = CGRectMake(5, 7, 50, 30);
+    [btn_topBarBack setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    //[btn_topBarBack setTitle:@"返回" forState:UIControlStateNormal];
     [btn_topBarBack setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btn_topBarBack.titleLabel.font = [UIFont boldSystemFontOfSize:16];
     [btn_topBarBack addTarget:self action:@selector(hideImgListView) forControlEvents:UIControlEventTouchUpInside];
     [view_topBar addSubview:btn_topBarBack];
     
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+    
     [self hideImgList];
     
     for (int i = 0; i < [arr_imgList count]; i++) {
         NSMutableDictionary *dic_item = [[NSMutableDictionary alloc] initWithDictionary:[arr_imgList objectAtIndex:i]];
+        NSString *str_imgID = [dic_item objectForKey:@"imgID"];
         UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 370)];
         view_content.backgroundColor = [UIColor clearColor];
         [sclView_item addSubview:view_content];
-        
-        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
         
         UIScrollView *sclView_topic = [[UIScrollView alloc] initWithFrame:view_content.bounds];
         sclView_topic.backgroundColor = [UIColor clearColor];
@@ -122,7 +124,8 @@
         [sclView_topic addSubview:tv_content];
         [dic_item setObject:tv_content forKey:@"tv_content"];
         
-        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(0, 85, 320, 200) withID:@"" img:nil];
+        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(0, 85, 320, 200) withID:str_imgID img:nil];
+        //imgView.delegate = self;
         [sclView_topic addSubview:imgView];
         [dic_item setObject:imgView forKey:@"imgView"];
         [arr_imgList replaceObjectAtIndex:i withObject:dic_item];
@@ -179,11 +182,11 @@
     [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
     [view_shareList addSubview:btn_hideShare];
     
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShareList)];
-//    tap.numberOfTapsRequired = 1;
-//    tap.numberOfTouchesRequired = 1;
-//    tap.delegate = self;
-//    [view_shareList addGestureRecognizer:tap];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShareList)];
+    tap.numberOfTapsRequired = 1;
+    tap.numberOfTouchesRequired = 1;
+    tap.delegate = self;
+    [view_shareList addGestureRecognizer:tap];
     
     UIImageView *imgView_bk = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shareBK.png"]];
     imgView_bk.frame = view_share.bounds;
@@ -269,6 +272,7 @@
 #pragma mark buttonFunction
 -(void)turnBack
 {
+    [self cancelAllRequests];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -332,6 +336,7 @@
         NSDictionary *dic_item = [[NSMutableDictionary alloc] initWithDictionary:[arr_imgList objectAtIndex:i]];
         //NSLog(@"dic_item:%@",dic_item);
         
+        NSString *str_tempId = [dic_item objectForKey:@"imgID"];
         UILabel *lb_title = [dic_item objectForKey:@"lb_title"];
         lb_title.text = [dic_item objectForKey:@"contentTitle"];
         
@@ -354,11 +359,30 @@
             img = [UIImage imageWithContentsOfFile:str_imgAddress];
             imgView.img = img;
         }
-        else {
+    }
+    sclView_item.contentSize = CGSizeMake(320*[arr_imgList count], 370);
+}
+
+-(void)loadAllTopImage
+{
+    for (int i = 0; i < [arr_imgList count]; i++) {
+        NSDictionary *dic_item = [[NSMutableDictionary alloc] initWithDictionary:[arr_imgList objectAtIndex:i]];
+        NSString *str_imgAddress = [dic_item objectForKey:@"largeImgAddress"];
+        if ([str_imgAddress length] == 0) {
             [self requestImage:dic_item imgType:@"0"];
         }
     }
-    sclView_item.contentSize = CGSizeMake(320*[arr_imgList count], 370);
+}
+
+-(void)loadAllListImage
+{
+    for (int i = 0; i < [arr_imgList count]; i++) {
+        NSDictionary *dic_item = [[NSMutableDictionary alloc] initWithDictionary:[arr_imgList objectAtIndex:i]];
+        NSString *str_imgAddress = [dic_item objectForKey:@"smallImgAddress"];
+        if ([str_imgAddress length] == 0) {
+            [self requestImage:dic_item imgType:@"1"];
+        }
+    }
 }
 
 -(void)showShareList
@@ -463,6 +487,7 @@
 
 -(void)showImgListView
 {
+    [self loadAllListImage];
     [self refreshImgListView];
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.6f];
@@ -507,6 +532,7 @@
             int row = i/3;
             int col = i%3;
             imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5+col*105, 50+row*75, 100, 70) withID:[NSString stringWithFormat:@"%d",i] img:nil];
+            //imgView.delegate = self;
             [sclView_imgList addSubview:imgView];
             [dic_item setObject:imgView forKey:@"smallImgView"];
             [arr_imgList replaceObjectAtIndex:i withObject:dic_item];
@@ -516,15 +542,12 @@
             [imgView addGestureRecognizer:tapGesture];
         }
         NSString *str_imgAddress = [dic_item objectForKey:@"smallImgAddress"];
-        if ([str_imgAddress length] == 0) {
-            [self requestImage:dic_item imgType:@"1"];
-            //NSLog(@"dic_item:%@",dic_item);
-        }
-        else {
+        if ([str_imgAddress length] > 0) {
             UIImage *img = [UIImage imageWithContentsOfFile:str_imgAddress];
             imgView.img = img;
         }
     }
+    
     int rows = [arr_imgList count]/3;
     sclView_imgList.contentSize = CGSizeMake(320, 50+75*rows);
 }
@@ -534,7 +557,11 @@
     int index = fabs(sclView_item.contentOffset.x) / sclView_item.frame.size.width;
     NSDictionary *dic_item = [arr_imgList objectAtIndex:index];
     CustomImageView *imgView = (CustomImageView *)[dic_item objectForKey:@"imgView"];
-    UIImageWriteToSavedPhotosAlbum(imgView.img, self, @selector(completeDownloadToAlbumImage:didFinishSavingWithError:contextInfo:), nil);
+    if (imgView != nil) {
+        if (imgView.img != nil) {
+            UIImageWriteToSavedPhotosAlbum(imgView.img, self, @selector(completeDownloadToAlbumImage:didFinishSavingWithError:contextInfo:), nil);
+        }
+    }
 }
 
 - (void)completeDownloadToAlbumImage: (UIImage *) image
@@ -715,6 +742,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)detailRequestBody
@@ -738,6 +766,9 @@
     else {
         str_url = [dic_info objectForKey:@"smallImgUrl"];
     }
+    if ([str_url length] == 0) {
+        return;
+    }
     NSURL *_url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_url]];
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:_url];
@@ -760,6 +791,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 #pragma mark -
@@ -836,8 +868,6 @@
                     view_content.backgroundColor = [UIColor clearColor];
                     [sclView_item addSubview:view_content];
                     
-                    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
-                    
                     UIScrollView *sclView_topic = [[UIScrollView alloc] initWithFrame:view_content.bounds];
                     sclView_topic.backgroundColor = [UIColor clearColor];
                     sclView_topic.directionalLockEnabled = YES;
@@ -862,15 +892,16 @@
                     [dic_newInfo setObject:tv_content forKey:@"tv_content"];
                     
                     CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(0, 85, 320, 200) withID:@"" img:nil];
+                    //imgView.delegate = self;
                     [sclView_topic addSubview:imgView];
                     [dic_newInfo setObject:imgView forKey:@"imgView"];
                     [arr_imgList addObject:dic_newInfo];
-                    [self requestImage:dic_newInfo imgType:@"0"];
+                    //[self requestImage:dic_newInfo imgType:@"0"];
                 }
                 //NSLog(@"arr_imgList:%@",arr_imgList);
                 [self refreshView];
             }
-            
+            [self loadAllTopImage];
 //            if ([str_class intValue] == 1) {
                 
                 //[self.view setNeedsDisplay];
@@ -890,11 +921,13 @@
     else if ([str_operate isEqualToString:@"downloadImg"]) {
         UIImage *img = [[UIImage alloc] initWithData:request.responseData];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = @"";
         NSString *str_imgID = [dic_info objectForKey:@"imgID"];
         NSString *str_imgType = [dic_info objectForKey:@"imgType"];
+        NSLog(@"str_imgID:%@,%@",str_imgID,str_imgType);
 
         str_address = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/Caches/Image/%@",str_fileName]];
 
@@ -920,6 +953,7 @@
                     [dic_newInfo setObject:imgView_small forKey:@"smallImgView"];
                 }
                 [arr_imgList replaceObjectAtIndex:i withObject:dic_newInfo];
+                break;
             }
         }
         
@@ -946,6 +980,15 @@
     if ([indView isAnimating] == YES) {
         [indView stopAnimating];
     }
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 #pragma mark - WBSendViewDelegate Methods

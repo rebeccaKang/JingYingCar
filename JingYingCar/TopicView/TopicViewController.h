@@ -18,6 +18,8 @@
     NSMutableArray *arr_topicID;
     
     UIActivityIndicatorView *indViewLarge;
+    
+    NSMutableArray *arr_requests;
 }
 
 @end

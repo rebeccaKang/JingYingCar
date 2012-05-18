@@ -31,6 +31,9 @@
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.layer.shadowOffset = CGSizeMake(0, 1);
+    view_nav.layer.shadowOpacity = 0.8;
+    view_nav.layer.shadowColor = [UIColor blackColor].CGColor;
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -76,6 +79,8 @@
     tbl_list.delegate = self;
     tbl_list.dataSource = self;
     [view_content addSubview:tbl_list];
+    
+    [self.view bringSubviewToFront:view_nav];
 }
 
 - (void)viewDidLoad
@@ -191,7 +196,7 @@
         view_bk.tag = 0;
         [cell addSubview:view_bk];
         
-        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, 100, 50)];
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 80, 50)];
         imgView.tag = 1;
         [cell addSubview:imgView];
         

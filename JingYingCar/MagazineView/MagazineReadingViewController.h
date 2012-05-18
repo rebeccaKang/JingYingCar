@@ -10,16 +10,18 @@
 #import "AppDelegate.h"
 #import "PDFReadingView.h"
 
-@interface MagazineReadingViewController : UIViewController <UIScrollViewDelegate>
+@interface MagazineReadingViewController : UIViewController <UIScrollViewDelegate,UIAlertViewDelegate>
 {
     NSDictionary *dic_magazineInfo;
     NSString *magazineID;
     PDFReadingView *view_pdfReading;
+    UIScrollView *sclView_pdf;
     
     UIPageControl *con_page;
     
     UILabel *lb_page;
-    NSArray *arr_images;
+    NSMutableArray *arr_images;
+    int pageCount;
 }
 
 @property (nonatomic,retain) NSString *magazineID;

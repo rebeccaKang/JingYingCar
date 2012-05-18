@@ -25,6 +25,8 @@
     BOOL isDeleteMode;
     
     id<MagazineEditDelegate>delegate;
+    
+    NSMutableArray *arr_requests;
 }
 
 @property (nonatomic,retain) id<MagazineEditDelegate>delegate;

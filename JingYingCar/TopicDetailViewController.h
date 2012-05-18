@@ -36,6 +36,8 @@
     UIActivityIndicatorView *indView;
     
     int isCollected;
+    
+    NSMutableArray *arr_requests;
 }
 
 @property (nonatomic) NSInteger type;

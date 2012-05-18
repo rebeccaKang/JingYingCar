@@ -19,6 +19,8 @@
     NSMutableArray *arr_buttons;
     
     UIView *view_content;
+    
+    NSMutableArray *arr_requests;
 }
 
 @end

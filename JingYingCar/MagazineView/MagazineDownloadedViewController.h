@@ -15,6 +15,8 @@
     UITableView *tbl_magazineList;
     
     NSMutableArray *arr_magazineData;
+    
+    NSMutableArray *arr_requests;
 }
 
 @property (nonatomic,retain) NSArray *arr_magazineList;

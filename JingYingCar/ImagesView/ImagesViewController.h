@@ -28,6 +28,8 @@
     
     BOOL isGettingBefore;
     BOOL isGettingLater;
+    
+    NSMutableArray *arr_requests;
 }
 
 @end

@@ -61,7 +61,7 @@
     indViewLarge = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [indViewLarge setCenter:self.view.center];
     [self.view addSubview:indViewLarge];
-    
+    arr_requests = [[NSMutableArray alloc] init];
     arr_topicList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getTopicList]];
     [self requestTopicList];
 }
@@ -88,6 +88,9 @@
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.layer.shadowOffset = CGSizeMake(0, 1);
+    view_nav.layer.shadowOpacity = 1;
+    view_nav.layer.shadowColor = [UIColor blackColor].CGColor;
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -121,6 +124,7 @@
     [view_content addSubview:tbl_topicList];
     
     [self.view bringSubviewToFront:indViewLarge];
+    [self.view bringSubviewToFront:view_nav];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -219,6 +223,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)topicListRequestBody
@@ -234,6 +239,9 @@
 {
     NSString *str_imgUrl = [info objectForKey:@"smallImgUrl"];
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_imgUrl]];
+    if ([str_imgUrl length] == 0) {
+        return;
+    }
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:url];
 	//设置ASIHTTPRequest代理
@@ -253,13 +261,19 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 #pragma mark - Table view data source
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tableHeader.png"]];
+    view.backgroundColor = [UIColor clearColor];
+    
+    UIImageView *imgView_background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tableHeader.png"]];
+    imgView_background.frame = view.bounds;
+    [view addSubview:imgView_background];
+    
     UILabel *lb_header = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 220, 30)];
     lb_header.text = [arr_class objectAtIndex:section];
     lb_header.textColor = [UIColor whiteColor];
@@ -320,7 +334,7 @@
         [cell addSubview:imgView];
         
         UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(110, 0, 180, 20)];
-        lb_title.textColor = [UIColor grayColor];
+        lb_title.textColor = [UIColor colorWithWhite:0.4f alpha:1];
         lb_title.font = [UIFont systemFontOfSize:12];
         lb_title.backgroundColor = [UIColor clearColor];
         lb_title.tag = 1;
@@ -362,7 +376,7 @@
             imgView.img = img;
         }
         else {
-            [self requestImage:dic_news];
+            //[self requestImage:dic_news];
         }
         
         UILabel *lb_title = (UILabel *)[cell viewWithTag:1];
@@ -376,6 +390,20 @@
     }
     
     return cell;
+}
+
+-(void)reloadImage
+{
+    for (int i = 0; i < [arr_topicList count]; i++) {
+        NSArray *arr_topics = [arr_topicList objectAtIndex:i];
+        for (int j = 0; j < [arr_topics count]; j++) {
+            NSDictionary *dic_news = [arr_topics objectAtIndex:j];
+            NSString *str_imgAddress = [dic_news objectForKey:@"smallImgAddress"];
+            if ([str_imgAddress length] == 0) {
+                [self requestImage:dic_news];
+            }
+        }
+    }
 }
 
 #pragma mark - Table view delegate
@@ -430,10 +458,10 @@
         }
         NSArray *arr_response = [xmlDoc nodesForXPath:@"//Response" error:&error];
         
-        NSMutableArray *arr_engine = [[NSMutableArray alloc] init];
-        NSMutableArray *arr_ontheway = [[NSMutableArray alloc] init];
-        NSMutableArray *arr_view = [[NSMutableArray alloc] init];
-        NSMutableArray *arr_acceraltion = [[NSMutableArray alloc] init];
+//        NSMutableArray *arr_engine = [[NSMutableArray alloc] init];
+//        NSMutableArray *arr_ontheway = [[NSMutableArray alloc] init];
+//        NSMutableArray *arr_view = [[NSMutableArray alloc] init];
+//        NSMutableArray *arr_acceraltion = [[NSMutableArray alloc] init];
         
         NSMutableArray *arr_temp = [[NSMutableArray alloc] init];
         
@@ -484,31 +512,44 @@
                 }
                 else if(result == 103)
                 {
-                    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
-                    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
-                    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                    BOOL isExist = NO;
                     for (int i = 0; i < [arr_oldInfo count]; i++) {
                         NSDictionary *dic_topImg = [arr_oldInfo objectAtIndex:i];
-                        NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
-                        NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
-                        NSDate *date_current = [dateForm_time dateFromString:str_update];
-                        if ([date_current compare:date_temp] == NSOrderedDescending) {
-                            [arr_oldInfo insertObject:dic_newInfo atIndex:i];
-                            break;
-                        }
-                        else if(i == [arr_oldInfo count] - 1) 
-                        {
-                            [arr_oldInfo addObject:dic_newInfo];
+                        NSString *str_tempId = [dic_topImg objectForKey:@"id"];
+                        if ([str_tempId isEqualToString:str_id] ) {
+                            [arr_oldInfo replaceObjectAtIndex:i withObject:dic_newInfo];
+                            isExist = YES;
                             break;
                         }
                     }
-                    if ([arr_oldInfo count] == 0) {
-                        [arr_oldInfo addObject:dic_newInfo];
+                    if (isExist == NO) {
+                        NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+                        [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+                        [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                        for (int i = 0; i < [arr_oldInfo count]; i++) {
+                            NSDictionary *dic_topImg = [arr_oldInfo objectAtIndex:i];
+                            NSString *str_tempCreateTime = [dic_topImg objectForKey:@"createTime"];
+                            NSDate *date_temp = [dateForm_time dateFromString:str_tempCreateTime];
+                            NSDate *date_current = [dateForm_time dateFromString:str_update];
+                            if ([date_current compare:date_temp] == NSOrderedDescending) {
+                                [arr_oldInfo insertObject:dic_newInfo atIndex:i];
+                                break;
+                            }
+                            else if(i == [arr_oldInfo count] - 1) 
+                            {
+                                [arr_oldInfo addObject:dic_newInfo];
+                                break;
+                            }
+                        }
+                        if ([arr_oldInfo count] == 0) {
+                            [arr_oldInfo addObject:dic_newInfo];
+                        }
                     }
                 }
                 [tbl_topicList reloadData];
             }
         }
+        [self reloadImage];
 //        [[SqlManager sharedManager] saveTopicList:arr_temp];
 //        for (int i = 0; i < [arr_topicID count]; i++) {
 //            NSString *str_id = [arr_topicID objectAtIndex:i];
@@ -555,6 +596,7 @@
     else if ([str_operate isEqualToString:@"downloadImg"]) {
         NSString *str_newsId = [dic_userInfo objectForKey:@"id"];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/Caches/Topic/%@",str_fileName]];
@@ -588,6 +630,15 @@
     if ([indViewLarge isAnimating] == YES) {
         [indViewLarge stopAnimating];
     }
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 

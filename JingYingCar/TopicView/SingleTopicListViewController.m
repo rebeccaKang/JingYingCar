@@ -31,7 +31,7 @@
     [super loadView];
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
-    
+    arr_requests = [[NSMutableArray alloc] init];
     arr_topicList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getTopicListWithFatherID:[NSString stringWithFormat:@"%d",type]]];
     
     if ([arr_topicList count] == 0) {
@@ -53,7 +53,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7, 50, 30);
+    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
     btn_back.backgroundColor = [UIColor clearColor];
     [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
@@ -96,6 +96,7 @@
 #pragma mark buttonFunction
 -(void)turnBack
 {
+    [self cancelAllRequests];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -127,6 +128,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)topicListRequestBody:(NSString *)direction
@@ -163,6 +165,9 @@
 {
     NSString *str_url = [dic_info objectForKey:@"smallImgUrl"];
     NSURL *_url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_url]];
+    if ([str_url length] == 0) {
+        return;
+    }
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:_url];
 	//设置ASIHTTPRequest代理
@@ -182,6 +187,7 @@
     //添加到ASINetworkQueue队列去下载
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 
@@ -285,6 +291,7 @@
     else if ([str_operate isEqualToString:@"downloadImg"]) {
         NSString *str_newsId = [dic_userInfo objectForKey:@"id"];
         NSString *str_fileName = request.url.lastPathComponent;
+        str_fileName = [NSString stringWithFormat:@"%@@2x%@",[str_fileName substringToIndex:[str_fileName length] -4],[str_fileName substringFromIndex:[str_fileName length]-4]];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *str_address = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/Caches/Topic/%@",str_fileName]];
@@ -316,6 +323,15 @@
     if ([indViewLarge isAnimating] == YES) {
         [indViewLarge stopAnimating];
     }
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 #pragma mark - Table view data source

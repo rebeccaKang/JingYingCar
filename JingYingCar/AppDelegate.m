@@ -66,6 +66,8 @@ static UIImage *barImage = nil;
 	[netWorkQueue setShowAccurateProgress:YES];
 	[netWorkQueue go];
     
+    arr_requests = [[NSMutableArray alloc] init];
+    
     [self getClassTotal];
     
     NSDictionary *dic_configure = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] readConfigure]];
@@ -170,6 +172,16 @@ static UIImage *barImage = nil;
 {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    NSDate *time = [NSDate date];
+    NSDateFormatter *dateForm_time = [[NSDateFormatter alloc] init];
+    [dateForm_time setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+    [dateForm_time setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSString *strTime = [dateForm_time stringFromDate:time];
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:strTime forKey:@"lastLogOutTime"];
+    
+    [[SqlManager sharedManager] emptyBuffer:bufferTime];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -189,6 +201,17 @@ static UIImage *barImage = nil;
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    [[SqlManager sharedManager] emptyBuffer:bufferTime];
+    [self cancelAllRequests];
+}
+
+-(void)cancelAllRequests
+{
+    for (int i = 0; i < [arr_requests count]; i++) {
+        ASIHTTPRequest *request = [arr_requests objectAtIndex:i];
+        [request cancel];
+    }
+    [arr_requests removeAllObjects];
 }
 
 #pragma mark -
@@ -222,6 +245,7 @@ static UIImage *barImage = nil;
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
 	[netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(void)getClassTotal
@@ -245,12 +269,19 @@ static UIImage *barImage = nil;
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
 	[netWorkQueue addOperation:request];
+    [arr_requests addObject:request];
 }
 
 -(NSString *)setGetTotalRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTotal"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    NSString *str_time = [userDefault objectForKey:@"lastLogOutTime"];
+    if ([str_time length] == 0) {
+        str_time = @"1900-00-00 00:00:00";
+    }
+    DDXMLNode *node_update = [DDXMLNode elementWithName:@"Update" stringValue:str_time];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_update,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -325,8 +356,6 @@ static UIImage *barImage = nil;
     NSLog(@"responseString1:%@",responseString);
     
     if ([str_operate isEqualToString:@"GetTotal"]) {
-        
-        
         NSError *error = nil;
         DDXMLDocument* xmlDoc = [[DDXMLDocument alloc] initWithXMLString:responseString options:0 error:&error];
         if (error) {
@@ -336,25 +365,63 @@ static UIImage *barImage = nil;
         for (DDXMLElement *element_reponse in arr_reponse) {
             NSArray *arr_code = [element_reponse elementsForName:@"Code"];
             NSString *str_code = [[arr_code objectAtIndex:0] stringValue];
-            NSArray *arr_topicNum = [element_reponse elementsForName:@"Topic"];
-            NSInteger oldTopicNum = [[SqlManager sharedManager] getTopicsUnreadedNumber];
-            NSString *str_topicNum = [[arr_topicNum objectAtIndex:0] stringValue];
-            NSArray *arr_ImagesNum = [element_reponse elementsForName:@"Images"];
-            NSInteger oldImageNum = [[SqlManager sharedManager] getImagesUnreadedNumber];
-            NSString *str_imageNum = [[arr_ImagesNum objectAtIndex:0] stringValue];
+            
+            NSArray *arr_HotNewsInfo = [element_reponse elementsForName:@"HotNews"];
+            DDXMLElement *element_hotNewsInfo = [arr_HotNewsInfo objectAtIndex:0];
+            NSArray *arr_hotNewsRefresh = [element_hotNewsInfo elementsForName:@"Refresh"];
+            NSString *str_hotNewsRefresh = [[arr_hotNewsRefresh objectAtIndex:0] stringValue];
+            NSArray *arr_hotNewsDelete = [element_hotNewsInfo elementsForName:@"Delete"];
+            NSString *str_hotNewsDelete = [[arr_hotNewsDelete objectAtIndex:0] stringValue];
+            NSArray *arr_hotNewsDeleteIDs = [str_hotNewsDelete componentsSeparatedByString:@","];
+            for (int i = 0; i < [arr_hotNewsDeleteIDs count]; i++) {
+                [[SqlManager sharedManager] deleteHotNews:[arr_hotNewsDeleteIDs objectAtIndex:i]];
+            }
+            
+            NSArray *arr_topicInfo = [element_reponse elementsForName:@"Topic"];
+            //NSInteger oldTopicNum = [[SqlManager sharedManager] getTopicsUnreadedNumber];
+            DDXMLElement *element_topicInfo = [arr_topicInfo objectAtIndex:0];
+            NSArray *arr_topicRefresh = [element_topicInfo elementsForName:@"Refresh"];
+            NSString *str_topicRefresh = [[arr_topicRefresh objectAtIndex:0] stringValue];
+            NSArray *arr_topicDelete = [element_topicInfo elementsForName:@"Delete"];
+            NSString *str_topicDelete = [[arr_topicDelete objectAtIndex:0] stringValue];
+            NSArray *arr_topicDeleteIDs = [str_topicDelete componentsSeparatedByString:@","];
+            for (int i = 0; i < [arr_topicDeleteIDs count]; i++) {
+                [[SqlManager sharedManager] deleteHotNews:[arr_topicDeleteIDs objectAtIndex:i]];
+            }
+            
+            NSArray *arr_imagesInfo = [element_reponse elementsForName:@"Images"];
+            //NSInteger oldImageNum = [[SqlManager sharedManager] getImagesUnreadedNumber];
+            DDXMLElement *element_imagesInfo = [arr_imagesInfo objectAtIndex:0];
+            NSArray *arr_imagesRefresh = [element_imagesInfo elementsForName:@"Refresh"];
+            NSString *str_imagesRefresh = [[arr_imagesRefresh objectAtIndex:0] stringValue];
+            NSArray *arr_imagesDelete = [element_imagesInfo elementsForName:@"Delete"];
+            NSString *str_imagesDelete = [[arr_imagesDelete objectAtIndex:0] stringValue];
+            NSArray *arr_imagesDeleteIDs = [str_imagesDelete componentsSeparatedByString:@","];
+            for (int i = 0; i < [arr_imagesDeleteIDs count]; i++) {
+                [[SqlManager sharedManager] deleteHotNews:[arr_imagesDeleteIDs objectAtIndex:i]];
+            }
+            
+            NSArray *arr_magazineInfo = [element_reponse elementsForName:@"Magazine"];
+            DDXMLElement *element_magazineInfo = [arr_magazineInfo objectAtIndex:0];
+            NSArray *arr_magazineRefresh = [element_magazineInfo elementsForName:@"Refresh"];
+            NSString *str_magazineRefresh = [[arr_magazineRefresh objectAtIndex:0] stringValue];
+            NSArray *arr_magazineDelete = [element_magazineInfo elementsForName:@"Delete"];
+            NSString *str_magazineDelete = [[arr_magazineDelete objectAtIndex:0] stringValue];
+            NSArray *arr_magazineDeleteIDs = [str_magazineDelete componentsSeparatedByString:@","];
+            for (int i = 0; i < [arr_magazineDeleteIDs count]; i++) {
+                [[SqlManager sharedManager] deleteHotNews:[arr_magazineDeleteIDs objectAtIndex:i]];
+            }
+            
             for (UIViewController *controller in tabCon_main.viewControllers) {
                 if (controller.tabBarItem.tag == 1) {
-                    int num = [str_imageNum intValue] - oldImageNum;
-                    NSLog(@"%d",oldImageNum);
-                    if (num > 0) {
-                        controller.tabBarItem.badgeValue = [[NSNumber numberWithInt:num] stringValue];
+                    if ([str_imagesRefresh intValue] > 0) {
+                        controller.tabBarItem.badgeValue = str_imagesRefresh;
                     }
                 }
                 else if(controller.tabBarItem.tag == 2)
                 {
-                    int num = [str_topicNum intValue] - oldTopicNum;
-                    if (num > 0) {
-                        controller.tabBarItem.badgeValue = [[NSNumber numberWithInt:num] stringValue];
+                    if ([str_topicRefresh intValue] > 0) {
+                        controller.tabBarItem.badgeValue = str_topicRefresh;
                     }
                 }
             }

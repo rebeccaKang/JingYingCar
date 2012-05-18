@@ -29,6 +29,21 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     [super loadView];
+    
+    dic_magazineInfo = [[SqlManager sharedManager] getMagazineInfoWithID:magazineID];
+    
+    NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
+    NSURL *url_pdf = [[NSURL alloc] initFileURLWithPath:str_address];
+    CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url_pdf);
+    if (pdf == nil) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"警告" message:@"文件已损坏或无法识别的格式" delegate:self cancelButtonTitle:@"确定" otherButtonTitles: nil];
+        alertView.delegate = self;
+        [alertView show];
+        return;
+    }
+    //CFRelease((__bridge CFURLRef)url_pdf);
+    pageCount = CGPDFDocumentGetNumberOfPages(pdf);
+    
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
@@ -38,7 +53,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7, 50, 30);
+    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
     [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
@@ -71,14 +86,19 @@
     view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
     [self.view addSubview:view_content];
     
-    dic_magazineInfo = [[SqlManager sharedManager] getMagazineInfoWithID:magazineID];
 //    NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
 //    if ([str_address length] > 0) {
 //        view_pdfReading = [[PDFReadingView alloc] initWithFrame:CGRectMake(0, 0, 320, 415) pdfAddress:str_address];
 //        [view_content addSubview:view_pdfReading];
 //    }
-    arr_images = [[NSArray alloc] initWithArray:[self getPDFImages]];
-    UIScrollView *sclView_pdf = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
+    
+    arr_images = [[NSMutableArray alloc] initWithArray:[self getPDFImages]];
+    arr_images = [[NSMutableArray alloc] init];
+    UIImage *img_firstPage = [self getPDFImage:1];
+    UIImage *img_secondPage = [self getPDFImage:2];
+    [arr_images addObject:img_firstPage];
+    [arr_images addObject:img_secondPage];
+    sclView_pdf = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
     sclView_pdf.contentSize = CGSizeMake(320 * [arr_images count], 415);
     sclView_pdf.pagingEnabled = YES;
     sclView_pdf.showsHorizontalScrollIndicator = NO;
@@ -111,7 +131,7 @@
     lb_page = [[UILabel alloc] initWithFrame:CGRectMake(0, 375, 320, 30)];
     lb_page.backgroundColor = [UIColor clearColor];
     lb_page.textAlignment = UITextAlignmentCenter;
-    lb_page.text = [NSString stringWithFormat:@"1/%d",[arr_images count]];
+    lb_page.text = [NSString stringWithFormat:@"1/%d",pageCount];
     lb_page.textColor = [UIColor blackColor];
     [view_content addSubview:lb_page];
 }
@@ -131,6 +151,14 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+#pragma mark - alertView
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 #pragma mark -
@@ -162,7 +190,6 @@
     NSURL *url_pdf = [[NSURL alloc] initFileURLWithPath:str_address];
     CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url_pdf);
     //CFRelease((__bridge CFURLRef)url_pdf);
-    int pageCount = CGPDFDocumentGetNumberOfPages(pdf);
     for (int i = 1; i <= pageCount; i++) {
         CGPDFPageRef page = CGPDFDocumentGetPage(pdf, i);
         CGRect pdfcropBox = CGRectIntegral(CGPDFPageGetBoxRect(page, kCGPDFCropBox));
@@ -201,6 +228,51 @@
     return arr_result;
 }
 
+-(UIImage *)getPDFImage:(int)page
+{
+    CGRect rect = CGRectMake(0, 0, 320, 415);
+    NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
+    NSURL *url_pdf = [[NSURL alloc] initFileURLWithPath:str_address];
+    CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url_pdf);
+    //CFRelease((__bridge CFURLRef)url_pdf);
+    if (page <= pageCount) {
+        CGPDFPageRef pageRef = CGPDFDocumentGetPage(pdf, page);
+        CGRect pdfcropBox = CGRectIntegral(CGPDFPageGetBoxRect(pageRef, kCGPDFCropBox));
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL,rect.size.width,
+                                                     rect.size.height,
+                                                     8,
+                                                     (int)rect.size.width * 4,
+                                                     colorSpace, 
+                                                     kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+        
+        CGColorSpaceRelease(colorSpace);
+        colorSpace = nil;
+        
+        CGPDFPageRetain(pageRef);
+        CGAffineTransform pdfTransform = CGPDFPageGetDrawingTransform(pageRef,
+                                                                      kCGPDFCropBox,
+                                                                      CGRectMake(0, 0, rect.size.width,rect.size.height),
+                                                                      0, true);
+        CGContextSaveGState(context);
+        CGContextConcatCTM(context, pdfTransform);
+        CGContextDrawPDFPage(context, pageRef);
+        CGPDFPageRelease (pageRef);
+        pageRef = nil;
+        CGContextRestoreGState(context);    
+        CGImageRef image = CGBitmapContextCreateImage(context);
+        UIImage *backgroundImage =  [UIImage imageWithCGImage:image];
+        CGContextClearRect(context, rect);
+        CGContextClearRect(context, pdfcropBox);
+        
+        CGContextRelease(context);
+        CGImageRelease(image);
+        context = nil; 
+        return backgroundImage;
+    }
+    return nil;
+}
+
 #pragma mark -
 #pragma mark scrollview
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
@@ -215,9 +287,9 @@
 	
 	//con_page.currentPage = index;
     
-    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,[arr_images count]];
+    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
 }
-- (void)scrollViewDidScroll:(UIScrollView *)sender {
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     // We don't want a "feedback loop" between the UIPageControl and the scroll delegate in
     // which a scroll event generated from the user hitting the page control triggers updates from
     // the delegate method. We use a boolean to disable the delegate logic when the page control is used.
@@ -225,8 +297,40 @@
     
     // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
     
-    
     // A possible optimization would be to unload the views+controllers which are no longer visible
+    float index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+    if (index+1 > [arr_images count] && [arr_images count] < pageCount) {
+        [self addNewPDFView];
+    }
+}
+
+-(void)addNewPDFView
+{
+    UIScrollView *sclView_img = [[UIScrollView alloc] initWithFrame:CGRectMake(320*[arr_images count], 0, 320, 415)];
+    sclView_img.showsHorizontalScrollIndicator = NO;
+    sclView_img.showsVerticalScrollIndicator = NO;
+    sclView_img.directionalLockEnabled = YES;
+    sclView_img.delegate = self;
+    sclView_img.minimumZoomScale = 1;
+    sclView_img.maximumZoomScale = 2.0f;
+    [sclView_pdf addSubview:sclView_img];
+    
+    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
+    UIImage *img = [self getPDFImage:[arr_images count] + 1];
+    imgView.image = img;
+    [sclView_img addSubview:imgView];
+    
+    [arr_images addObject:img];
+    
+    [sclView_pdf setContentSize:CGSizeMake(320*[arr_images count], 415)];
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    //NSLog(@"scrollView:%@",scrollView.subviews);
+    NSArray *arr_subviews = scrollView.subviews;
+    UIImageView *imgView = [arr_subviews objectAtIndex:0];
+    return imgView;
 }
 
 @end
