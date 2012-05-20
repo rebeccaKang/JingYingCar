@@ -54,7 +54,7 @@
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_edit = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_edit.frame = CGRectMake(250, 7, 52, 30);
+    btn_edit.frame = CGRectMake(260, 7.5, 52, 30);
     [btn_edit setBackgroundImage:[UIImage imageNamed:@"edit.png"] forState:UIControlStateNormal];
     //[btn_edit setTitle:@"编辑" forState:UIControlStateNormal];
     btn_edit.titleLabel.font = [UIFont boldSystemFontOfSize:17];
@@ -148,7 +148,7 @@
         }
         else {
             if ([str_imgAddress length] > 0) {
-                UIImage *image = [UIImage imageNamed:@"bookcover.png"];
+                UIImage *image = [UIImage imageWithContentsOfFile:str_imgAddress];
                 UIGraphicsBeginImageContext(image.size);
                 [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
                 //CGContextRef context = UIGraphicsGetCurrentContext();
@@ -157,6 +157,13 @@
                 UIGraphicsEndImageContext();
             }
             else {
+                UIImage *image = [UIImage imageNamed:@"bookcover.png"];
+                UIGraphicsBeginImageContext(image.size);
+                [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
+                //CGContextRef context = UIGraphicsGetCurrentContext();
+                CGImageRef imageRef = CGBitmapContextCreateImage(UIGraphicsGetCurrentContext());
+                img =  [UIImage imageWithCGImage:imageRef];  
+                UIGraphicsEndImageContext();
                 [self requestCover:dic_newInfo];
             }
         }

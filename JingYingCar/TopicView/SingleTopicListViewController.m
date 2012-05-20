@@ -338,7 +338,12 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    view.backgroundColor = [UIColor colorWithWhite:0.2 alpha:1];
+    view.backgroundColor = [UIColor clearColor];
+    
+    UIImageView *imgView_background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tableHeader.png"]];
+    imgView_background.frame = view.bounds;
+    [view addSubview:imgView_background];
+    
     UILabel *lb_header = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 220, 30)];
     NSString *str_title = @"";
     switch (type) {

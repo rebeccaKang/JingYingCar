@@ -69,15 +69,15 @@
     [self.view addSubview:sclView_imgList];
     
     UIView *view_topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
-    view_topBar.backgroundColor = [UIColor colorWithWhite:0.5f alpha:0.5f];
+    view_topBar.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"emptyNav.png"]];
     [sclView_imgList addSubview:view_topBar];
     
     UILabel *lb_topBarTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     lb_topBarTitle.backgroundColor = [UIColor clearColor];
-    lb_topBarTitle.textColor = [UIColor whiteColor];
+    lb_topBarTitle.textColor = [UIColor blackColor];
     lb_topBarTitle.textAlignment = UITextAlignmentLeft;
     lb_topBarTitle.text = [dic_info objectForKey:@"title"];
-    lb_topBarTitle.font = [UIFont boldSystemFontOfSize:17];
+    lb_topBarTitle.font = [UIFont boldSystemFontOfSize:24];
     lb_topBarTitle.textAlignment = UITextAlignmentCenter;
     [view_topBar addSubview:lb_topBarTitle];
     
@@ -178,7 +178,7 @@
     
     UIButton *btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_hideShare.backgroundColor = [UIColor clearColor];
-    btn_hideShare.frame = CGRectMake(0, 0, 320, 310);
+    btn_hideShare.frame = CGRectMake(0, 0, 320, 280);
     [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
     [view_shareList addSubview:btn_hideShare];
     

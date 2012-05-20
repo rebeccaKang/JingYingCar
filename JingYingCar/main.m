@@ -9,10 +9,16 @@
 #import <UIKit/UIKit.h>
 
 #import "AppDelegate.h"
+#import "AppDelegate_IPad.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        if (IS_IPAD) {
+            return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate_IPad class]));
+        }
+        else {
+            return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        }
     }
 }

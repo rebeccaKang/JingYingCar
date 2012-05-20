@@ -100,6 +100,7 @@
 #pragma mark buttonFunction
 -(void)turnBack
 {
+    [self cancelAllRequests];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -200,21 +201,22 @@
         imgView.tag = 1;
         [view_bk addSubview:imgView];
         
-        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(90, 0, 220, 30)];
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(90, 0, 130, 30)];
         lb_title.textColor = [UIColor grayColor];
         lb_title.font = [UIFont systemFontOfSize:16];
         lb_title.backgroundColor = [UIColor clearColor];
         lb_title.tag = 2;
         [view_bk addSubview:lb_title];
         
-        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(90, 30, 220, 30)];
+        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(90, 30, 130, 30)];
+        lb_summary.lineBreakMode = UILineBreakModeMiddleTruncation;
         lb_summary.textColor = [UIColor blackColor];
         lb_summary.font = [UIFont systemFontOfSize:16];
         lb_summary.backgroundColor = [UIColor clearColor];
         lb_summary.tag = 3;
         [view_bk addSubview:lb_summary];
         
-        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(90, 60, 220, 30)];
+        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(90, 60, 130, 30)];
         lb_update.textColor = [UIColor colorWithRed:0.384 green:0.286 blue:0.224 alpha:1];
         lb_update.font = [UIFont systemFontOfSize:16];
         lb_update.backgroundColor = [UIColor clearColor];

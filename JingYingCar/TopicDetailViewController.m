@@ -153,7 +153,7 @@
         
         UIButton *btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
         btn_hideShare.backgroundColor = [UIColor clearColor];
-        btn_hideShare.frame = CGRectMake(0, 0, 320, 310);
+        btn_hideShare.frame = CGRectMake(0, 0, 320, 280);
         [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
         [view_shareList addSubview:btn_hideShare];
         

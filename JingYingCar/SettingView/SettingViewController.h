@@ -10,12 +10,15 @@
 #import "SettingAboutViewController.h"
 #import "SettingTechSupportViewController.h"
 #import "SettingBufferViewController.h"
+#import "WBEngine.h"
 
-@interface SettingViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface SettingViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,WBEngineDelegate>
 {
     NSArray *arr_settings;
     UITableView *tbl_setting;
     NSArray *arr_time;
+    
+    WBEngine *SinaEngine;
 }
 
 @end

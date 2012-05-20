@@ -79,7 +79,7 @@
     
     UIButton *btn_attention = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn_attention setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
-    [btn_attention setTitle:@"关注新浪微博" forState:UIControlStateNormal];
+    [btn_attention setTitle:@"关注官方微博" forState:UIControlStateNormal];
     btn_attention.titleLabel.font = [UIFont boldSystemFontOfSize:12];
     btn_attention.frame = CGRectMake(80, 325, 160, 30);
     [view_content addSubview:btn_attention];
@@ -90,10 +90,17 @@
     lb_copyRight.backgroundColor = [UIColor clearColor];
     lb_copyRight.lineBreakMode = UILineBreakModeCharacterWrap;
     lb_copyRight.numberOfLines = 2;
+    lb_copyRight.textColor = [UIColor grayColor];
     lb_copyRight.text = @"Copyright © 2012 上海菁英广告传播有限公司. All Right Reserved";
     [view_content addSubview:lb_copyRight];
     
     arr_time = [NSArray arrayWithObjects:@"不缓存",@"一天",@"一周",@"一个月",@"永久", nil];
+    
+    SinaEngine = [[WBEngine alloc] initWithAppKey:kWBSDKDemoAppKey appSecret:kWBSDKDemoAppSecret];
+    [SinaEngine setRootViewController:self];
+    [SinaEngine setDelegate:self];
+    [SinaEngine setRedirectURI:@"http://"];
+    [SinaEngine setIsUserExclusive:NO];
     
     [self.view bringSubviewToFront:view_nav];
 }
@@ -140,6 +147,14 @@
     AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
     //[[SqlManager sharedManager] emptyBuffer:app.bufferTime];
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(void)createSinaFriend 
+{
+    NSMutableDictionary *dic_params = [[NSMutableDictionary alloc] init];
+    [dic_params setObject:@"" forKey:@"uId"];
+    [dic_params setObject:@"" forKey:@"screen_name"];
+    [SinaEngine loadRequestWithMethodName:@"friendships/create" httpMethod:@"POST" params:dic_params postDataType:kWBRequestPostDataTypeNormal httpHeaderFields:nil];
 }
 
 #pragma mark - Table view data source

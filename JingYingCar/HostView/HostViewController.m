@@ -1019,6 +1019,7 @@ static UIImage *barImage = nil;
         if (scrollView.contentOffset.y + scrollView.frame.size.height == scrollView.contentSize.height) {
             if (isGettingBefore == NO) {
                 [self requestHotNews:@"before"];
+                [self reloadImages];
                 isGettingBefore = YES;
                 
 //                NSMutableDictionary *dic_test = [[NSMutableDictionary alloc] init];
@@ -1037,8 +1038,27 @@ static UIImage *barImage = nil;
         else if (scrollView.contentOffset.y == 0) {
             if (isGettingLater == NO) {
                 [self requestHotNews:@"later"];
+                [self reloadImages];
                 isGettingLater = YES;
             }
+        }
+    }
+}
+
+-(void)reloadImages
+{
+    for (int i = 0; i < [arr_news count]; i++) {
+        NSDictionary *dic_news = [arr_news objectAtIndex:i];
+        NSString *str_smallImgAddress = [dic_news objectForKey:@"smallImgAddress"];
+        if ([str_smallImgAddress length] == 0) {
+            [self requestImage:dic_news imgType:@"1"];
+        }
+    }
+    for (int i = 0; i < [arr_largeImage count]; i++) {
+        NSDictionary *dic_news = [arr_largeImage objectAtIndex:i];
+        NSString *str_largeImgAddress = [dic_news objectForKey:@"largeImgAddress"];
+        if ([str_largeImgAddress length] == 0) {
+            [self requestImage:dic_news imgType:@"0"];
         }
     }
 }

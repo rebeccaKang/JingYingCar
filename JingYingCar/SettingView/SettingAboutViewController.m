@@ -47,7 +47,7 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
     view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"settingAbout.png"]];
     [self.view addSubview:view_content];
     

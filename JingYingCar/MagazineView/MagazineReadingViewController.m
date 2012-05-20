@@ -92,7 +92,7 @@
 //        [view_content addSubview:view_pdfReading];
 //    }
     
-    arr_images = [[NSMutableArray alloc] initWithArray:[self getPDFImages]];
+    //arr_images = [[NSMutableArray alloc] initWithArray:[self getPDFImages]];
     arr_images = [[NSMutableArray alloc] init];
     UIImage *img_firstPage = [self getPDFImage:1];
     UIImage *img_secondPage = [self getPDFImage:2];
@@ -283,11 +283,7 @@
     }
 	
     // Switch the indicator when more than 50% of the previous/next page is visible
-    int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-	
-	//con_page.currentPage = index;
     
-    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
 }
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     // We don't want a "feedback loop" between the UIPageControl and the scroll delegate in
@@ -298,8 +294,14 @@
     // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
     
     // A possible optimization would be to unload the views+controllers which are no longer visible
-    float index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-    if (index+1 > [arr_images count] && [arr_images count] < pageCount) {
+    int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+	
+	//con_page.currentPage = index;
+    
+    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
+    
+    float f_index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+    if (f_index+1 > [arr_images count] && [arr_images count] < pageCount) {
         [self addNewPDFView];
     }
 }
