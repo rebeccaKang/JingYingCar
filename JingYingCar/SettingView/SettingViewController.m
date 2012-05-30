@@ -82,6 +82,7 @@
     [btn_attention setTitle:@"关注官方微博" forState:UIControlStateNormal];
     btn_attention.titleLabel.font = [UIFont boldSystemFontOfSize:12];
     btn_attention.frame = CGRectMake(80, 325, 160, 30);
+    [btn_attention addTarget:self action:@selector(createSinaFriend) forControlEvents:UIControlEventTouchUpInside];
     [view_content addSubview:btn_attention];
     
     UILabel *lb_copyRight = [[UILabel alloc] initWithFrame:CGRectMake(30, 365, 260, 40)];
@@ -151,10 +152,98 @@
 
 -(void)createSinaFriend 
 {
+    if ([SinaEngine isLoggedIn] && ![SinaEngine isAuthorizeExpired])
+    {
+        NSMutableDictionary *dic_params = [[NSMutableDictionary alloc] init];
+        [dic_params setObject:@"1862862622" forKey:@"uId"];
+        [dic_params setObject:@"菁英车主" forKey:@"screen_name"];
+        [SinaEngine loadRequestWithMethodName:@"friendships/create.json" httpMethod:@"POST" params:dic_params postDataType:kWBRequestPostDataTypeNormal httpHeaderFields:nil];
+    }
+    else {
+        [SinaEngine logIn];
+    }
+}
+
+#pragma mark - WBEngineDelegate Methods
+- (void)engine:(WBEngine *)engine requestDidSucceedWithResult:(id)result
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"" message:@"菁英车主感谢您的关注" delegate:self cancelButtonTitle:@"确认" otherButtonTitles:nil];
+    
+}
+
+- (void)engine:(WBEngine *)engine requestDidFailWithError:(NSError *)error
+{
+    
+}
+
+#pragma mark Authorize
+
+- (void)engineAlreadyLoggedIn:(WBEngine *)engine
+{
+    //[indicatorView stopAnimating];
+    if ([engine isUserExclusive])
+    {
+        UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:nil 
+                                                           message:@"请先登出！" 
+                                                          delegate:nil
+                                                 cancelButtonTitle:@"确定" 
+                                                 otherButtonTitles:nil];
+        [alertView show];
+    }
+}
+
+- (void)engineDidLogIn:(WBEngine *)engine
+{
+    //[indicatorView stopAnimating];
+    UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:nil 
+													   message:@"登录成功！" 
+													  delegate:self
+											 cancelButtonTitle:@"确定" 
+											 otherButtonTitles:nil];
+    [alertView setTag:kWBAlertViewLogInTag];
+	[alertView show];
     NSMutableDictionary *dic_params = [[NSMutableDictionary alloc] init];
-    [dic_params setObject:@"" forKey:@"uId"];
-    [dic_params setObject:@"" forKey:@"screen_name"];
-    [SinaEngine loadRequestWithMethodName:@"friendships/create" httpMethod:@"POST" params:dic_params postDataType:kWBRequestPostDataTypeNormal httpHeaderFields:nil];
+    [dic_params setObject:@"1862862622" forKey:@"uId"];
+    [dic_params setObject:@"菁英车主" forKey:@"screen_name"];
+    [SinaEngine loadRequestWithMethodName:@"friendships/create.json" httpMethod:@"POST" params:dic_params postDataType:kWBRequestPostDataTypeNormal httpHeaderFields:nil];
+}
+
+- (void)engine:(WBEngine *)engine didFailToLogInWithError:(NSError *)error
+{
+    //[indicatorView stopAnimating];
+    NSLog(@"didFailToLogInWithError: %@", error);
+    UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:nil 
+													   message:@"登录失败！" 
+													  delegate:nil
+											 cancelButtonTitle:@"确定" 
+											 otherButtonTitles:nil];
+	[alertView show];
+}
+
+- (void)engineDidLogOut:(WBEngine *)engine
+{
+    UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:nil 
+													   message:@"登出成功！" 
+													  delegate:self
+											 cancelButtonTitle:@"确定" 
+											 otherButtonTitles:nil];
+    [alertView setTag:kWBAlertViewLogOutTag];
+	[alertView show];
+}
+
+- (void)engineNotAuthorized:(WBEngine *)engine
+{
+    
+}
+
+- (void)engineAuthorizeExpired:(WBEngine *)engine
+{
+    UIAlertView* alertView = [[UIAlertView alloc]initWithTitle:nil 
+													   message:@"请重新登录！" 
+													  delegate:nil
+											 cancelButtonTitle:@"确定" 
+											 otherButtonTitles:nil];
+	[alertView show];
 }
 
 #pragma mark - Table view data source

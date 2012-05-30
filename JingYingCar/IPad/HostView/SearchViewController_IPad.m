@@ -44,19 +44,19 @@
     
     [self.navigationController setNavigationBarHidden:YES];
     
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blackBackground_ipad.png"]];
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"hostNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
-    [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    btn_back.frame = CGRectMake(10, 7.5f, 55, 30);
+    [btn_back setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_back setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -64,32 +64,24 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
-    view_content.backgroundColor = [UIColor whiteColor];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 90, 768, 915)];
+    view_content.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_content];
     
     schBar = [[UISearchBar alloc] init];
-    schBar.frame = CGRectMake(0, 0, 320, 40);
+    schBar.frame = CGRectMake(0, 45, 768, 45);
     schBar.tintColor = [UIColor colorWithRed:0.721 green:0.76 blue:0.788 alpha:1];
     schBar.delegate = self;
-    [view_content addSubview:schBar];
+    [self.view addSubview:schBar];
+    
+    sclView_imgList = [[UIScrollView alloc] initWithFrame:view_content.bounds];
+    sclView_imgList.contentSize = view_content.frame.size;
+    sclView_imgList.pagingEnabled = NO;
+    sclView_imgList.directionalLockEnabled = YES;
+    sclView_imgList.delegate = self;
+    [view_content addSubview:sclView_imgList];
     
     arr_result = [[NSMutableArray alloc] init];
-    
-    tbl_result = [[UITableView alloc] initWithFrame:CGRectMake(0, 40, 320, 320) style:UITableViewStylePlain];
-    tbl_result.delegate = self;
-    tbl_result.dataSource = self;
-    [view_content addSubview:tbl_result];
-    if ([arr_result count] == 0) {
-        tbl_result.hidden = YES;
-    }
-    
-    UIButton *btn_left = [UIButton buttonWithType:UIButtonTypeCustom];
-	btn_left.frame = CGRectMake(0, 0, 80, 30);
-    [btn_left setBackgroundImage:[UIImage imageNamed:@"back.png"] forState:UIControlStateNormal];	
-    [btn_left addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
-	UIBarButtonItem *barBtn_left = [[UIBarButtonItem alloc] initWithCustomView:btn_left];
-    self.navigationItem.leftBarButtonItem = barBtn_left;
     
     [schBar becomeFirstResponder];
 }
@@ -128,154 +120,7 @@
 {
     if ([searchText length] == 0) {
         [arr_result removeAllObjects];
-        [tbl_result reloadData];
-        tbl_result.hidden = YES;
     }
-}
-
-#pragma mark - Table view data source
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    // Return the number of sections.
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    // Return the number of rows in the section.
-    return [arr_result count];
-}
-
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return 60;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    
-    // Configure the cell...
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 80, 50) withID:@"" img:nil];
-        imgView.tag = 10;
-        [cell addSubview:imgView];
-        
-        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(110, 0, 180, 20)];
-        lb_title.textColor = [UIColor grayColor];
-        lb_title.font = [UIFont systemFontOfSize:12];
-        lb_title.backgroundColor = [UIColor clearColor];
-        lb_title.tag = 1;
-        [cell addSubview:lb_title];
-        
-        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(110, 20, 180, 20)];
-        lb_summary.textColor = [UIColor blackColor];
-        lb_summary.font = [UIFont systemFontOfSize:14];
-        lb_summary.backgroundColor = [UIColor clearColor];
-        lb_summary.tag = 2;
-        [cell addSubview:lb_summary];
-        
-        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(110, 40, 180, 20)];
-        lb_update.textColor = [UIColor colorWithRed:0.384 green:0.286 blue:0.224 alpha:1];
-        lb_update.font = [UIFont systemFontOfSize:12];
-        lb_update.backgroundColor = [UIColor clearColor];
-        lb_update.tag = 3;
-        [cell addSubview:lb_update];
-        
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    }
-    
-    if (arr_result.count > indexPath.row) {
-        NSDictionary *dic_news = [arr_result objectAtIndex:indexPath.row];
-        NSLog(@"dic_news:%@",dic_news);
-        
-        CustomImageView *imgView = (CustomImageView *)[cell viewWithTag:10];
-        UIImage *img;
-        NSString *str_imgAddress = [dic_news objectForKey:@"smallImgAddress"];
-        if ([str_imgAddress length] > 0) {
-            img = [UIImage imageWithContentsOfFile:str_imgAddress];
-            imgView.img = img;
-        }
-        else {
-            [self requestImage:dic_news];
-        }
-        
-        UILabel *lb_title = (UILabel *)[cell viewWithTag:1];
-        lb_title.text = [dic_news objectForKey:@"title"];
-        
-        UILabel *lb_summary = (UILabel *)[cell viewWithTag:2];
-        lb_summary.text = [dic_news objectForKey:@"summary"];
-        
-        UILabel *lb_update = (UILabel *)[cell viewWithTag:3];
-        lb_update.text = [[dic_news objectForKey:@"createTime"] substringToIndex:10];
-    }
-    
-    return cell;
-}
-
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
- {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
-/*
- // Override to support editing the table view.
- - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
- {
- if (editingStyle == UITableViewCellEditingStyleDelete) {
- // Delete the row from the data source
- [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
- }   
- else if (editingStyle == UITableViewCellEditingStyleInsert) {
- // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
- }   
- }
- */
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
- {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
- {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
-    
-    NSDictionary *dic_news = [arr_result objectAtIndex:indexPath.row];
-    //NSString *str_id = [dic_news objectForKey:@"id"];
-    
-    TopicDetailViewController_IPad *con_detail = [[TopicDetailViewController_IPad alloc] init];
-    con_detail.str_id = [dic_news objectForKey:@"id"];
-    con_detail.type = 2;
-    
-    [self.navigationController pushViewController:con_detail animated:YES];
-    
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark -
@@ -303,7 +148,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -311,22 +156,30 @@
 -(NSString *)searchRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"Search"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
     DDXMLNode *node_keyWord = [DDXMLNode elementWithName:@"Keyword" stringValue:schBar.text];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_keyWord,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_keyWord,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
 }
 
--(void)requestImage:(NSDictionary *)dic_info
+-(void)requestImage:(NSDictionary *)info imgType:(NSString *)type
 {
-    NSString *str_url = [dic_info objectForKey:@"smallImgUrl"];
-    NSURL *_url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_url]];
-    if ([str_url length] == 0) {
+    NSString *str_imgUrl = @"";
+    if ([type intValue] == 0) {
+        str_imgUrl = [info objectForKey:@"largeImgUrl"];
+    }
+    else if([type intValue] == 1)
+    {
+        str_imgUrl = [info objectForKey:@"smallImgUrl"];
+    }
+    if ([str_imgUrl length] == 0) {
         return;
     }
+    NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_imgUrl]];
     //设置
-	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:_url];
+	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:url];
 	//设置ASIHTTPRequest代理
 	request.delegate = self;
     //设置是是否支持断点下载
@@ -336,13 +189,14 @@
 	//NSLog(@"request total  httpBodyString :%@",httpBodyString);
 	
     //NSData *postData = [httpBodyString dataUsingEncoding:NSUTF8StringEncoding];
-    NSMutableDictionary *dic_userInfo = [[NSMutableDictionary alloc] initWithDictionary:dic_info];
+    NSMutableDictionary *dic_userInfo = [[NSMutableDictionary alloc] initWithDictionary:info];
+    [dic_userInfo setObject:type forKey:@"imgType"];
     [dic_userInfo setObject:@"downloadImg" forKey:@"operate"];
     [request setUserInfo:dic_userInfo];
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -427,11 +281,12 @@
                 if ([arr_result count] == 0) {
                     [arr_result addObject:dic_newInfo];
                 }
-                [tbl_result reloadData];
+                //[tbl_result reloadData];
+                [self reloadSearchResultViews];
             }
         }
         if ([arr_result count] > 0) {
-            tbl_result.hidden = NO;
+            //tbl_result.hidden = NO;
         }
     }
     else if ([str_operate isEqualToString:@"downloadImg"]) {
@@ -452,7 +307,7 @@
                 [arr_result replaceObjectAtIndex:i withObject:dic_item];
             }
         }
-        [tbl_result reloadData];
+        //[tbl_result reloadData];
     }
 }
 
@@ -480,5 +335,81 @@
     [arr_requests removeAllObjects];
 }
 
+-(void)reloadSearchResultViews
+{
+    NSArray *arr_subviews = [sclView_imgList subviews];
+    for (int i = 0; i < [arr_subviews count]; i++) {
+        UIView *view = [arr_subviews objectAtIndex:i];
+        [view removeFromSuperview];
+    }
+    for (int i = 0; i < [arr_result count]; i++) {
+        NSDictionary *dic_info = [arr_result objectAtIndex:i];
+        NSString *str_id = [dic_info objectForKey:@"id"];
+        NSString *str_title = [dic_info objectForKey:@"title"];
+        NSString *str_summary = [dic_info objectForKey:@"summary"];
+        NSString *str_time = [dic_info objectForKey:@"createTime"];
+        NSString *str_smallImgAddress = [dic_info objectForKey:@"smallImgAddress"];
+        
+        int row = i/2;
+        int col = i%2;
+        UIImage *img;
+        if ([str_smallImgAddress length] > 0) {
+            img = [UIImage imageWithContentsOfFile:str_smallImgAddress]; 
+        }
+        else {
+            [self requestImage:dic_info imgType:@"1"];
+        }
+        CustomImageView_IPad *imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(16+376*col, 16+216*row, 360, 200) withID:str_id img:img];
+        [sclView_imgList addSubview:imgView];
+        
+        UIImageView *imgView_arrow = [[UIImageView alloc] initWithFrame:CGRectMake(315, 5, 40, 40)];
+        imgView_arrow.image = [UIImage imageNamed:@"arrow_ipad.png"];
+        [imgView addSubview:imgView_arrow];
+        
+        UIView *view_summary = [[UIView alloc] initWithFrame:CGRectMake(0, 120, 360, 80)];
+        view_summary.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
+        [imgView addSubview:view_summary];
+        
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 360, 30)];
+        lb_title.backgroundColor = [UIColor clearColor];
+        lb_title.font = [UIFont boldSystemFontOfSize:20];
+        lb_title.textColor = [UIColor whiteColor];
+        lb_title.text = str_title;
+        [view_summary addSubview:lb_title];
+        
+        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(0, 30, 360, 25)];
+        lb_summary.backgroundColor = [UIColor clearColor];
+        lb_summary.font = [UIFont boldSystemFontOfSize:17];
+        lb_summary.textColor = [UIColor whiteColor];
+        lb_summary.text = str_summary;
+        [view_summary addSubview:lb_summary];
+        
+        UILabel *lb_time = [[UILabel alloc] initWithFrame:CGRectMake(0, 55, 360, 25)];
+        lb_time.backgroundColor = [UIColor clearColor];
+        lb_time.font = [UIFont boldSystemFontOfSize:17];
+        lb_time.textColor = [UIColor colorWithRed:0.196f green:0.008f blue:0.486f alpha:1];
+        lb_time.text = [str_time substringToIndex:10];
+        [view_summary addSubview:lb_time];
+        
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+        tap.numberOfTapsRequired = 1;
+        tap.numberOfTouchesRequired = 1;
+        tap.delegate = self;
+        [imgView addGestureRecognizer:tap];
+    }
+}
+
+#pragma mark -
+#pragma mark UIGestureRecognizer
+-(void)tapImage:(id)sender
+{
+    UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
+    CustomImageView_IPad *imgView = (CustomImageView_IPad *)tap.view;
+    TopicDetailViewController_IPad *con_detail = [[TopicDetailViewController_IPad alloc] init];
+    
+    con_detail.str_id = imgView.str_id;
+    
+    [self.navigationController pushViewController:con_detail animated:YES]; 
+}
 
 @end

@@ -9,6 +9,7 @@
 #import "TopicViewController_IPad.h"
 #import "SingleTopicListViewController_IPad.h"
 #import "CustomImageView_IPad.h"
+#import "SettingMainView_ipad.h"
 
 //static UIImage *barImage = nil;
 //@implementation UINavigationBar (CustomImage)
@@ -84,9 +85,9 @@
 //        [self.navigationController.navigationBar setImage:@"navHotNews.png"];
 //    }
     
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground_ipad.png"]];
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     view_nav.layer.shadowOffset = CGSizeMake(0, 1);
     view_nav.layer.shadowOpacity = 1;
@@ -94,34 +95,58 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"topicNav.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"topicNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_search = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_search.frame = CGRectMake(10, 10, 25, 25);
-    [btn_search setBackgroundImage:[UIImage imageNamed:@"search.png"] forState:UIControlStateNormal];
+    btn_search.frame = CGRectMake(5, 2.5, 40, 40);
+    [btn_search setBackgroundImage:[UIImage imageNamed:@"search_ipad.png"] forState:UIControlStateNormal];
     [btn_search addTarget:self action:@selector(turnToSearch:) forControlEvents:UIControlEventTouchUpInside];
     [view_nav addSubview:btn_search];
     
     UIButton *btn_setting = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_setting.frame = CGRectMake(285, 10, 25, 25);
-    [btn_setting setBackgroundImage:[UIImage imageNamed:@"setting.png"] forState:UIControlStateNormal];
+    btn_setting.frame = CGRectMake(718, 2.5, 40, 40);
+    [btn_setting setBackgroundImage:[UIImage imageNamed:@"setting_ipad.png"] forState:UIControlStateNormal];
     [btn_setting addTarget:self action:@selector(showSetting) forControlEvents:UIControlEventTouchUpInside];
     [view_nav addSubview:btn_setting];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 960)];
     view_content.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_content];
     
     arr_class = [NSArray arrayWithObjects:@"引擎Engine",@"在路上On the way",@"眼界View",@"加速度Acceleration", nil];
-    arr_topicID = [[NSMutableArray alloc] init];
     
-    tbl_topicList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 370) style:UITableViewStylePlain];
-    tbl_topicList.backgroundColor = [UIColor whiteColor];
-    tbl_topicList.delegate = self;
-    tbl_topicList.dataSource = self;
-    tbl_topicList.scrollEnabled = YES;
-    [view_content addSubview:tbl_topicList];
+    btn_engine = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_engine.frame = CGRectMake(50, 10, 140, 210);
+    [btn_engine setBackgroundImage:[UIImage imageNamed:@"engineHighlighted_ipad.png"] forState:UIControlStateNormal];
+    [btn_engine addTarget:self action:@selector(tapTypeButton:) forControlEvents:UIControlEventTouchUpInside];
+    [view_content addSubview:btn_engine];
+    
+    btn_ontheway = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_ontheway.frame = CGRectMake(50, 235, 140, 210);
+    [btn_ontheway setBackgroundImage:[UIImage imageNamed:@"ontheway_ipad.png"] forState:UIControlStateNormal];
+    [btn_ontheway addTarget:self action:@selector(tapTypeButton:) forControlEvents:UIControlEventTouchUpInside];
+    [view_content addSubview:btn_ontheway];
+    
+    btn_view = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_view.frame = CGRectMake(50, 460, 140, 210);
+    [btn_view setBackgroundImage:[UIImage imageNamed:@"view_ipad.png"] forState:UIControlStateNormal];
+    [btn_view addTarget:self action:@selector(tapTypeButton:) forControlEvents:UIControlEventTouchUpInside];
+    [view_content addSubview:btn_view];
+    
+    btn_acceleration = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_acceleration.frame = CGRectMake(50, 685, 140, 210);
+    [btn_acceleration setBackgroundImage:[UIImage imageNamed:@"acceleration_ipad.png"] forState:UIControlStateNormal];
+    [btn_acceleration addTarget:self action:@selector(tapTypeButton:) forControlEvents:UIControlEventTouchUpInside];
+    [view_content addSubview:btn_acceleration];
+    
+    currentType = 0;
+    
+    tbl_topic = [[UITableView alloc] initWithFrame:CGRectMake(250, 0, 518, 915) style:UITableViewStylePlain];
+    tbl_topic.backgroundColor = [UIColor clearColor];
+    tbl_topic.delegate = self;
+    tbl_topic.dataSource = self;
+    [view_content addSubview:tbl_topic];
     
     [self.view bringSubviewToFront:indViewLarge];
     [self.view bringSubviewToFront:view_nav];
@@ -129,7 +154,7 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     NSString *str_shouldRequest = [app.arr_shouldRequest objectAtIndex:2];
     if ([str_shouldRequest isEqualToString:@"0"]) {
         [self requestTopicList];
@@ -160,10 +185,23 @@
 
 -(void)showSetting
 {
-    SettingViewController_IPad *con_setting = [[SettingViewController_IPad alloc] init];
-    //[self.navigationController pushViewController:con_setting animated:YES];
-    UINavigationController *nav_setting = [[UINavigationController alloc] initWithRootViewController:con_setting];
-    [self presentViewController:nav_setting animated:YES completion:nil];
+//    SettingViewController_IPad *con_setting = [[SettingViewController_IPad alloc] init];
+//    //[self.navigationController pushViewController:con_setting animated:YES];
+//    UINavigationController *nav_setting = [[UINavigationController alloc] initWithRootViewController:con_setting];
+//    [self presentViewController:nav_setting animated:YES completion:nil];
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
+    if (app.isShowSetting == YES) {
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        if (!window)
+        {
+            window = [[UIApplication sharedApplication].windows objectAtIndex:0];
+        }
+        SettingMainView_ipad *view_setting = (SettingMainView_ipad *)[window viewWithTag:settingViewTag];
+        [view_setting hide:YES];
+        return;
+    }
+    SettingMainView_ipad *view_setting = [[SettingMainView_ipad alloc] initWithFrame:CGRectMake(0, 60, 768, 915)];
+    [view_setting show:YES];
 }
 
 -(void)showMore:(UIButton *)sender
@@ -196,6 +234,32 @@
     [self.navigationController pushViewController:con_singleList animated:YES];
 }
 
+-(void)tapTypeButton:(id)sender
+{
+    [btn_engine setBackgroundImage:[UIImage imageNamed:@"engine_ipad.png"] forState:UIControlStateNormal];
+    [btn_ontheway setBackgroundImage:[UIImage imageNamed:@"ontheway_ipad.png"] forState:UIControlStateNormal];
+    [btn_view setBackgroundImage:[UIImage imageNamed:@"view_ipad.png"] forState:UIControlStateNormal];
+    [btn_acceleration setBackgroundImage:[UIImage imageNamed:@"acceleration_ipad.png"] forState:UIControlStateNormal];
+    UIButton *btn_sender = (UIButton *)sender;
+    if (btn_sender ==  btn_engine) {
+        [btn_engine setBackgroundImage:[UIImage imageNamed:@"engineHighlighted_ipad.png"] forState:UIControlStateNormal];
+        currentType = 0;
+    }
+    else if (btn_sender == btn_ontheway) {
+        [btn_ontheway setBackgroundImage:[UIImage imageNamed:@"onthewayHighlighted_ipad.png"] forState:UIControlStateNormal];
+        currentType = 1;
+    }
+    else if (btn_sender == btn_view) {
+        [btn_view setBackgroundImage:[UIImage imageNamed:@"viewHighlighted_ipad.png"] forState:UIControlStateNormal];
+        currentType = 2;
+    }
+    else if (btn_sender == btn_acceleration) {
+        [btn_acceleration setBackgroundImage:[UIImage imageNamed:@"accelerationHighlighted_ipad.png"] forState:UIControlStateNormal];
+        currentType = 3;
+    }
+    [tbl_topic reloadData];
+}
+
 #pragma mark -
 #pragma mark connection
 -(void)requestTopicList
@@ -221,7 +285,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -229,7 +293,8 @@
 -(NSString *)topicListRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTopicList"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -259,66 +324,32 @@
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
 
 #pragma mark - Table view data source
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 30)];
-    view.backgroundColor = [UIColor clearColor];
-    
-    UIImageView *imgView_background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tableHeader.png"]];
-    imgView_background.frame = view.bounds;
-    [view addSubview:imgView_background];
-    
-    UILabel *lb_header = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 220, 30)];
-    lb_header.text = [arr_class objectAtIndex:section];
-    lb_header.textColor = [UIColor whiteColor];
-    lb_header.font = [UIFont boldSystemFontOfSize:14];
-    lb_header.backgroundColor = [UIColor clearColor];
-    [view addSubview:lb_header];
-    
-    UIButton *btn_more = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_more.frame = CGRectMake(260, 0, 60, 30);
-    [btn_more setTitle:@"更多" forState:UIControlStateNormal];
-    btn_more.backgroundColor = [UIColor clearColor];
-    [btn_more setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    btn_more.titleLabel.font = [UIFont systemFontOfSize:12];
-    btn_more.titleLabel.textAlignment = UITextAlignmentRight;
-    btn_more.tag = 100+section;
-    [btn_more addTarget:self action:@selector(showMore:) forControlEvents:UIControlEventTouchUpInside];
-    [view addSubview:btn_more];
-    
-    return view;
-}
-
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-    return 30;
-}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return [arr_class count];
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     NSArray *arr_topics;
-    if ([arr_topicList count] > section) {
-        arr_topics = [arr_topicList objectAtIndex:section];
+    if ([arr_topicList count] > currentType) {
+        arr_topics = [arr_topicList objectAtIndex:currentType];
     }
     return [arr_topics count];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 60;
+    return 230;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -329,37 +360,51 @@
     // Configure the cell...
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 80, 50) withID:@"" img:nil];
+        cell.backgroundColor = [UIColor whiteColor];
+        
+        CustomImageView_IPad *imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(30, 15, 360, 200) withID:@"" img:nil];
+        imgView.layer.shadowOffset = CGSizeMake(0, 1);
+        imgView.layer.shadowOpacity = 1;
+        imgView.layer.shadowColor = [UIColor blackColor].CGColor;
         imgView.tag = 10;
         [cell addSubview:imgView];
         
-        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(110, 0, 180, 20)];
-        lb_title.textColor = [UIColor colorWithWhite:0.4f alpha:1];
-        lb_title.font = [UIFont systemFontOfSize:12];
+        UIView *view_summary = [[UIView alloc] initWithFrame:CGRectMake(0, 120, 360, 80)];
+        view_summary.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
+        view_summary.tag = 11;
+        [imgView addSubview:view_summary];
+        
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 360, 30)];
         lb_title.backgroundColor = [UIColor clearColor];
+        lb_title.font = [UIFont boldSystemFontOfSize:20];
+        lb_title.textColor = [UIColor whiteColor];
         lb_title.tag = 1;
-        [cell addSubview:lb_title];
+        [view_summary addSubview:lb_title];
         
-        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(110, 20, 180, 20)];
-        lb_summary.textColor = [UIColor blackColor];
-        lb_summary.font = [UIFont systemFontOfSize:14];
+        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(0, 30, 360, 25)];
         lb_summary.backgroundColor = [UIColor clearColor];
+        lb_summary.font = [UIFont boldSystemFontOfSize:17];
+        lb_summary.textColor = [UIColor whiteColor];
         lb_summary.tag = 2;
-        [cell addSubview:lb_summary];
+        [view_summary addSubview:lb_summary];
         
-        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(110, 40, 180, 20)];
-        lb_update.textColor = [UIColor colorWithRed:0.384 green:0.286 blue:0.224 alpha:1];
-        lb_update.font = [UIFont systemFontOfSize:12];
-        lb_update.backgroundColor = [UIColor clearColor];
-        lb_update.tag = 3;
-        [cell addSubview:lb_update];
+        UILabel *lb_time = [[UILabel alloc] initWithFrame:CGRectMake(0, 55, 360, 25)];
+        lb_time.backgroundColor = [UIColor clearColor];
+        lb_time.font = [UIFont boldSystemFontOfSize:17];
+        lb_time.textColor = [UIColor colorWithRed:0.196f green:0.008f blue:0.486f alpha:1];
+        lb_time.tag = 3;
+        [view_summary addSubview:lb_time];
         
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        UIImageView *imgView_detail = [[UIImageView alloc] initWithFrame:CGRectMake(420, 85, 60, 60)];
+        imgView_detail.image = [UIImage imageNamed:@"topicDetail_ipad.png"];
+        [cell addSubview:imgView_detail];
+        
+        //cell.accessoryType = UITableViewCellAccessoryNone;
     }
     
     NSArray *arr_topics;
     if ([arr_topicList count] > indexPath.section) {
-        arr_topics = [arr_topicList objectAtIndex:indexPath.section];
+        arr_topics = [arr_topicList objectAtIndex:currentType];
     }
     else {
         return cell;
@@ -368,7 +413,7 @@
     if (arr_topics.count > indexPath.row) {
         NSDictionary *dic_news = [arr_topics objectAtIndex:indexPath.row];
         
-        CustomImageView *imgView = (CustomImageView *)[cell viewWithTag:10];
+        CustomImageView_IPad *imgView = (CustomImageView_IPad *)[cell viewWithTag:10];
         UIImage *img;
         NSString *str_imgAddress = [dic_news objectForKey:@"smallImgAddress"];
         if ([str_imgAddress length] > 0) {
@@ -377,15 +422,18 @@
         }
         else {
             //[self requestImage:dic_news];
+            imgView.img = nil;
         }
         
-        UILabel *lb_title = (UILabel *)[cell viewWithTag:1];
+        UIView *view_summary = (UIView *)[imgView viewWithTag:11];
+        
+        UILabel *lb_title = (UILabel *)[view_summary viewWithTag:1];
         lb_title.text = [dic_news objectForKey:@"title"];
         
-        UILabel *lb_summary = (UILabel *)[cell viewWithTag:2];
+        UILabel *lb_summary = (UILabel *)[view_summary viewWithTag:2];
         lb_summary.text = [dic_news objectForKey:@"summary"];
         
-        UILabel *lb_update = (UILabel *)[cell viewWithTag:3];
+        UILabel *lb_update = (UILabel *)[view_summary viewWithTag:3];
         lb_update.text = [[dic_news objectForKey:@"createTime"] substringToIndex:10];
     }
     
@@ -418,9 +466,9 @@
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
     
-    TopicDetailViewController_IPad *con_detail = [[TopicDetailViewController alloc] init];
+    TopicDetailViewController_IPad *con_detail = [[TopicDetailViewController_IPad alloc] init];
     
-    NSArray *arr_list = [arr_topicList objectAtIndex:indexPath.section];
+    NSArray *arr_list = [arr_topicList objectAtIndex:currentType];
     
     NSDictionary *dic_news = [arr_list objectAtIndex:indexPath.row];
     con_detail.str_id = [dic_news objectForKey:@"id"];
@@ -494,7 +542,6 @@
                 NSString *str_fatherID = [[arr_fatherID objectAtIndex:0] stringValue];
                 [dic_itemSaved setObject:str_fatherID forKey:@"fatherID"];
                 [arr_temp addObject:dic_itemSaved];
-                [arr_topicID addObject:str_id];
                 
                 int result = [[SqlManager sharedManager] saveTopicInfo:dic_itemSaved];
                 
@@ -546,7 +593,7 @@
                         }
                     }
                 }
-                [tbl_topicList reloadData];
+                [tbl_topic reloadData];
             }
         }
         [self reloadImage];
@@ -613,7 +660,7 @@
                 [arr_temp replaceObjectAtIndex:i withObject:dic_item];
             }
         }
-        [tbl_topicList reloadData];
+        [tbl_topic reloadData];
     }
 }
 

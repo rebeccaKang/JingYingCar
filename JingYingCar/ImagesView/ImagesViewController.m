@@ -70,7 +70,9 @@
     if ([arr_imgList count] == 0) {
         [self requestImgList:@"before"];
     }
-    
+    else {
+        [self requestImgList:@"later"];
+    }
 }
 
 - (void)viewDidLoad
@@ -340,7 +342,8 @@
 -(NSString *)topImgRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTopImageList"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -397,9 +400,10 @@
     }
     NSLog(@"strTime:%@",strTime);
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetImageList"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     DDXMLNode *node_update = [DDXMLNode elementWithName:@"Update" stringValue:strTime];
     DDXMLNode *node_direction = [DDXMLNode elementWithName:@"Direction" stringValue:direction];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_update,node_direction,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_update,node_direction,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];

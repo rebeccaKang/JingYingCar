@@ -611,8 +611,9 @@
         node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTopicDetail"];
     }
     //NSString *str_id = [dic_detail objectForKey:@"id"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     DDXMLNode *node_id = [DDXMLNode elementWithName:@"ID" stringValue:str_id];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_id,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_id,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];

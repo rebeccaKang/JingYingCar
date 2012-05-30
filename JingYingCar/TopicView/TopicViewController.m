@@ -84,7 +84,7 @@
 //        [self.navigationController.navigationBar setImage:@"navHotNews.png"];
 //    }
     
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
@@ -117,7 +117,7 @@
     arr_topicID = [[NSMutableArray alloc] init];
     
     tbl_topicList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 370) style:UITableViewStylePlain];
-    tbl_topicList.backgroundColor = [UIColor whiteColor];
+    tbl_topicList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
     tbl_topicList.delegate = self;
     tbl_topicList.dataSource = self;
     tbl_topicList.scrollEnabled = YES;
@@ -229,7 +229,8 @@
 -(NSString *)topicListRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTopicList"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -329,6 +330,12 @@
     // Configure the cell...
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+        
+        UIView *view_bk = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+        view_bk.backgroundColor = [UIColor whiteColor];
+        [cell addSubview:view_bk];
+        [cell sendSubviewToBack:view_bk];
+        
         CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 80, 50) withID:@"" img:nil];
         imgView.tag = 10;
         [cell addSubview:imgView];

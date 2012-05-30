@@ -9,26 +9,19 @@
 #import <UIKit/UIKit.h>
 #import "ASIHTTPRequest.h"
 #import "AppDelegate_IPad.h"
+#import "SettingMainView_ipad.h"
 
 @interface HostViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource,ASIHTTPRequestDelegate,UIScrollViewDelegate,UIGestureRecognizerDelegate>
 {
-    UITableView *tbl_hotNews;
     NSMutableArray *arr_news;
     NSMutableArray *arr_largeImage;
     
     UIScrollView *sclView_largeImage;
+    UIScrollView *sclView_imgList;
     
     UIPageControl *con_page;
-    
-    UIImageView *imgView_largePic;
-    UILabel *lb_largePic;
-    
-    NSMutableArray *arr_topID;
-    NSMutableArray *arr_listID;
-    
-    int largeImgNum;
 
-//    SettingViewController *con_setting;
+    SettingViewController_IPad *con_setting;
 //    SearchViewController *con_search;
     
     BOOL isGettingBefore;
@@ -40,6 +33,8 @@
     
     UIView *view_loadingAtTop;
     UIView *view_loadingAtBottom;
+    
+    //SettingMainView_ipad *view_setting;
 }
 
 @end

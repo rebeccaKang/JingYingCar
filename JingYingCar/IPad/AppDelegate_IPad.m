@@ -52,6 +52,7 @@ static UIImage *barImage = nil;
 @synthesize bufferTime;
 @synthesize navCon_main;
 @synthesize arr_shouldRequest;
+@synthesize isShowSetting;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -100,19 +101,19 @@ static UIImage *barImage = nil;
 //    [self.window setRootViewController:tabCon_main];
     
     HostViewController_IPad *con_hostView = [[HostViewController_IPad alloc] init];
-    con_hostView.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"首页" image:[UIImage imageNamed:@"host1.png"] tag:0];
+    con_hostView.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"首页" image:[UIImage imageNamed:@"host_ipad.png"] tag:0];
     
     ImagesViewController_IPad *con_images = [[ImagesViewController_IPad alloc] init];
-    con_images.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"图库" image:[UIImage imageNamed:@"images1.png"] tag:1];
+    con_images.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"图库" image:[UIImage imageNamed:@"images_ipad.png"] tag:1];
     
     TopicViewController_IPad *con_topic = [[TopicViewController_IPad alloc] init];
-    con_topic.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"文章" image:[UIImage imageNamed:@"topic1.png"] tag:2];
+    con_topic.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"文章" image:[UIImage imageNamed:@"topic_ipad.png"] tag:2];
     
     BookshelfViewController_IPad *con_bookshelf = [[BookshelfViewController_IPad alloc] init];
-    con_bookshelf.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"杂志" image:[UIImage imageNamed:@"magazine1.png"] tag:3];
+    con_bookshelf.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"杂志" image:[UIImage imageNamed:@"magazine_ipad.png"] tag:3];
     
     MoreViewController_IPad *con_more = [[MoreViewController_IPad alloc] init];
-    con_more.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"更多" image:[UIImage imageNamed:@"more1.png"] tag:4];
+    con_more.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"更多" image:[UIImage imageNamed:@"more_ipad.png"] tag:4];
     
     tabCon_main = [[UITabBarController alloc] init];
     tabCon_main.delegate = self;
@@ -218,7 +219,7 @@ static UIImage *barImage = nil;
 #pragma mark buttonFunction
 -(void)turnToSearch:(UIButton *)sender
 {
-    SearchViewController *con_seach = [[SearchViewController alloc] init];
+    SearchViewController_IPad *con_seach = [[SearchViewController_IPad alloc] init];
     [nav_main pushViewController:con_seach animated:YES];
 }
 
@@ -301,11 +302,15 @@ static UIImage *barImage = nil;
 #pragma mark TabbarDelegate
 -(void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
-    switch (viewController.tabBarItem.tag) {
+    if (isShowSetting == YES) {
+        SettingMainView_ipad *view_setting = (SettingMainView_ipad *)[self.window viewWithTag:settingViewTag];
+        [view_setting hide:YES];
+        isShowSetting = NO;
+    }
+    switch (tabBarController.selectedIndex) {
         case 0:
         {
             NSLog(@"0");
-            
         }
             break;
         case 1:

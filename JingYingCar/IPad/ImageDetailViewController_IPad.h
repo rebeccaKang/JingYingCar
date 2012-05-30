@@ -38,8 +38,16 @@
     UIScrollView *sclView_item;
     
     UIScrollView *sclView_imgList;
+    UIView *view_imgList;
     
     NSMutableArray *arr_requests;
+    
+    UIButton *btn_hideShare;
+    
+    BOOL isShowShareList;
+    
+    UIButton *btn_lastImg;
+    UIButton *btn_nextImg;
 }
 
 @property (nonatomic,retain) NSString *str_id;

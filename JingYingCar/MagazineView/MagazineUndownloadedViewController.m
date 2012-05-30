@@ -37,7 +37,7 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"magazineNav.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -53,7 +53,7 @@
     UIButton *btn_delete = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_delete.frame = CGRectMake(260, 7, 60, 30);
     [btn_delete setBackgroundImage:[UIImage imageNamed:@"rectButton.png"] forState:UIControlStateNormal];
-    [btn_delete setTitle:@" 删除" forState:UIControlStateNormal];
+    [btn_delete setTitle:@"删除" forState:UIControlStateNormal];
     [btn_delete addTarget:self action:@selector(deleteMode) forControlEvents:UIControlEventTouchUpInside];
     [btn_delete setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btn_delete.titleLabel.font = [UIFont boldSystemFontOfSize:14];
@@ -243,13 +243,13 @@
         [btn_read addTarget:self action:@selector(readMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_read];
         
-        UIImageView *imgView_progressBottom = [[UIImageView alloc] initWithFrame:CGRectMake(230, 70, 80, 10)];
+        UIImageView *imgView_progressBottom = [[UIImageView alloc] initWithFrame:CGRectMake(221, 70, 97.5, 4)];
         imgView_progressBottom.image = [UIImage imageNamed:@"pgBottom.png"];
         [view_bk addSubview:imgView_progressBottom];
         imgView_progressBottom.hidden = YES; 
         imgView_progressBottom.tag = 7;
         
-        UIImageView *imgView_progressTop = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, 10)];
+        UIImageView *imgView_progressTop = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, 4)];
         imgView_progressTop.image = [UIImage imageNamed:@"pgTop.png"];
         [imgView_progressBottom addSubview:imgView_progressTop];
         imgView_progressTop.tag = 8;
@@ -322,7 +322,7 @@
                 
                 UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:8];
                 CGFloat percent = [[dic_magazineData objectForKey:@"percent"] floatValue];
-                imgView_top.frame = CGRectMake(0, 0, 80*percent, 10);
+                imgView_top.frame = CGRectMake(0, 0, 97.5*percent, 4);
                 break;
             }
         }
@@ -343,6 +343,11 @@
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
 }
 
 // Override to support editing the table view.

@@ -47,7 +47,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
-    view_nav.backgroundColor = [UIColor clearColor];
+    view_nav.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
@@ -311,8 +311,9 @@
 -(NSString *)searchRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"Search"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     DDXMLNode *node_keyWord = [DDXMLNode elementWithName:@"Keyword" stringValue:schBar.text];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_keyWord,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_keyWord,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];

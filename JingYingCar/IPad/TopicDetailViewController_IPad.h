@@ -38,6 +38,10 @@
     int isCollected;
     
     NSMutableArray *arr_requests;
+    
+    BOOL isShowShareList;
+    
+    UIButton *btn_hideShare;
 }
 
 @property (nonatomic) NSInteger type;

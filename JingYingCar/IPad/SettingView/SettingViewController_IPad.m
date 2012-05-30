@@ -35,8 +35,10 @@
     
     [self.navigationController setNavigationBarHidden:YES];
     
-    self.view.backgroundColor = [UIColor clearColor];
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    self.view.frame = CGRectMake(99, 165, 570, 630);
+    
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"settingBackground_ipad.png"]];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 570, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     view_nav.layer.shadowOffset = CGSizeMake(0, 1);
     view_nav.layer.shadowOpacity = 1;
@@ -44,7 +46,7 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"settingNav.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"settingNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
 //    UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -103,6 +105,8 @@
     [SinaEngine setIsUserExclusive:NO];
     
     [self.view bringSubviewToFront:view_nav];
+    
+    [self show];
 }
 
 - (void)viewDidLoad
@@ -127,6 +131,55 @@
     [tbl_setting reloadData];
 }
 
+-(void)show
+{
+    [self.view setAlpha:0];
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    [self.view setTransform:CGAffineTransformScale(transform, 0.3, 0.3)];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.2];
+    [UIView setAnimationDelegate:self];
+    [UIView setAnimationDidStopSelector:@selector(bounceOutAnimationStopped)];
+    [self.view setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.6f]];
+    [self.view setAlpha:0.5];
+    [self.view setTransform:CGAffineTransformScale(transform,1.6, 1.6)];
+    [UIView commitAnimations];
+}
+
+#pragma mark Animations
+
+- (void)bounceOutAnimationStopped
+{
+    [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDuration:0.13];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDidStopSelector:@selector(bounceInAnimationStopped)];
+    [self.view setAlpha:0.8];
+	[self.view setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.5,1.5)];
+	[UIView commitAnimations];
+}
+
+- (void)bounceInAnimationStopped
+{
+    [UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDuration:0.13];
+    [UIView setAnimationDelegate:self];
+	[UIView setAnimationDidStopSelector:@selector(bounceNormalAnimationStopped)];
+    [self.view setAlpha:1.0];
+	[self.view setTransform:CGAffineTransformScale(CGAffineTransformIdentity, 1.0, 1.0)];
+	[UIView commitAnimations];
+}
+
+- (void)bounceNormalAnimationStopped
+{
+    [self allAnimationsStopped];
+}
+
+- (void)allAnimationsStopped
+{
+    //[self.view setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.6f]];
+}
+
 #pragma mark -
 #pragma mark buttonFunction
 -(void)turnBack
@@ -144,7 +197,7 @@
 //    transition.subtype = kCATransitionFromTop;
 //    transition.delegate = self;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     //[[SqlManager sharedManager] emptyBuffer:app.bufferTime];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -193,7 +246,7 @@
                     segment.frame = CGRectMake(120, 10, 180, 30);
                     [segment addTarget:self action:@selector(changeFontSize:) forControlEvents:UIControlEventValueChanged];
                     [cell addSubview:segment];
-                    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+                    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
                     segment.selectedSegmentIndex = app.fontSize;
                     
                     UIImageView *imgView_icon = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 30, 30)];
@@ -246,7 +299,7 @@
             if (indexPath.row == 0) {
             }
             else if (indexPath.row == 1) {
-                AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+                AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
                 cell.detailTextLabel.text = [arr_time objectAtIndex:app.bufferTime];
                 cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
@@ -330,7 +383,7 @@
 #pragma mark uisegmentControl
 -(void)changeFontSize:(UISegmentedControl *)sender
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     app.fontSize = sender.selectedSegmentIndex;
     NSMutableDictionary *dic_configure = [[NSMutableDictionary alloc] init];
     [dic_configure setObject:[NSString stringWithFormat:@"%d",app.fontSize] forKey:@"fontSize"];

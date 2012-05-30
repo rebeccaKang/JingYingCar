@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import "AppDelegate_IPad.h"
 
 @interface SettingBufferViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource>
 {

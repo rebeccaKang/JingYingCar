@@ -294,15 +294,17 @@
     // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
     
     // A possible optimization would be to unload the views+controllers which are no longer visible
-    int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-	
-	//con_page.currentPage = index;
-    
-    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
-    
-    float f_index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-    if (f_index+1 > [arr_images count] && [arr_images count] < pageCount) {
-        [self addNewPDFView];
+    if (scrollView == sclView_pdf) {
+        int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+        
+        //con_page.currentPage = index;
+        
+        lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
+        
+        float f_index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+        if (f_index+1 > [arr_images count] && [arr_images count] < pageCount) {
+            [self addNewPDFView];
+        }
     }
 }
 

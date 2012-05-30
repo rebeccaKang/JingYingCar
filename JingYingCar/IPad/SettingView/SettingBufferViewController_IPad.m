@@ -59,7 +59,7 @@
     
     arr_time = [NSArray arrayWithObjects:@"不缓存",@"一天",@"一周",@"一个月",@"永久", nil];
     
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     NSDictionary *dic_configure = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] readConfigure]];
     app.fontSize = [[dic_configure objectForKey:@"fontSize"] integerValue];
     app.bufferTime = [[dic_configure objectForKey:@"bufferTime"] integerValue];
@@ -88,7 +88,7 @@
 #pragma mark buttonFunction
 -(void)turnBack
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     app.bufferTime = choice;
     NSMutableDictionary *dic_configure = [[NSMutableDictionary alloc] init];
     [dic_configure setObject:[NSString stringWithFormat:@"%d",app.fontSize] forKey:@"fontSize"];

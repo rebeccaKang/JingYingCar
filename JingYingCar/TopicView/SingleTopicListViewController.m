@@ -44,6 +44,8 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+    
     UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
@@ -63,12 +65,12 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 460)];
     view_content.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_content];
     
-    tbl_topicList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 360) style:UITableViewStylePlain];
-    tbl_topicList.backgroundColor = [UIColor clearColor];
+    tbl_topicList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 460) style:UITableViewStylePlain];
+    tbl_topicList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
     tbl_topicList.delegate = self;
     tbl_topicList.dataSource = self;
     [view_content addSubview:tbl_topicList];
@@ -152,10 +154,11 @@
         strTime = [dateForm_time stringFromDate:time];
     }
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetOneTopicList"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     DDXMLNode *node_fatherID = [DDXMLNode elementWithName:@"FatherID" stringValue:[NSString stringWithFormat:@"%d",type]];
     DDXMLNode *node_update = [DDXMLNode elementWithName:@"Update" stringValue:strTime];
     DDXMLNode *node_direction = [DDXMLNode elementWithName:@"Direction" stringValue:direction];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_fatherID,node_update,node_direction,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_fatherID,node_update,node_direction,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -409,6 +412,12 @@
     // Configure the cell...
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+        
+        UIView *view_bk = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+        view_bk.backgroundColor = [UIColor whiteColor];
+        [cell addSubview:view_bk];
+        [cell sendSubviewToBack:view_bk];
+        
         CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 80, 50) withID:@"" img:nil];
         imgView.tag = 10;
         [cell addSubview:imgView];

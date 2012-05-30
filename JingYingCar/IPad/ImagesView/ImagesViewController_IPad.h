@@ -8,21 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "AppDelegate_IPad.h"
+#import "SettingMainView_ipad.h"
 
 @interface ImagesViewController_IPad : UIViewController<UIScrollViewDelegate,ASIHTTPRequestDelegate,UIGestureRecognizerDelegate>
 {
-    UIScrollView *sclView_top;
-    UIPageControl *con_page;
-    int largeImgNum;
-    
     UIScrollView *sclView_imgList;
     
-    NSMutableArray *arr_topImgs;
     NSMutableArray *arr_imgList;
     NSMutableArray *arr_buttons;
-    
-    NSMutableArray *arr_topID;
-    NSMutableArray *arr_listID;
     
     UIActivityIndicatorView *indViewLarge;
     

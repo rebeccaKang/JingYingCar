@@ -42,7 +42,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     view_nav.layer.shadowOffset = CGSizeMake(0, 1);
     view_nav.layer.shadowOpacity = 1;
@@ -50,14 +50,14 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"magazineNav.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"magazineNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_edit = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_edit.frame = CGRectMake(260, 7.5, 52, 30);
-    [btn_edit setBackgroundImage:[UIImage imageNamed:@"edit.png"] forState:UIControlStateNormal];
-    //[btn_edit setTitle:@"编辑" forState:UIControlStateNormal];
-    btn_edit.titleLabel.font = [UIFont boldSystemFontOfSize:17];
+    btn_edit.frame = CGRectMake(695, 7.5f, 60, 30);
+    [btn_edit setBackgroundImage:[UIImage imageNamed:@"rectButton_ipad.png"] forState:UIControlStateNormal];
+    [btn_edit setTitle:@"编辑" forState:UIControlStateNormal];
+    btn_edit.titleLabel.font = [UIFont systemFontOfSize:17];
     [btn_edit setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btn_edit.titleLabel.textAlignment = UITextAlignmentLeft;
     [btn_edit addTarget:self action:@selector(turnToEditMagazine:) forControlEvents:UIControlEventTouchUpInside];
@@ -73,12 +73,12 @@
 //    [btn_get addTarget:self action:@selector(turnToGetMagazine:) forControlEvents:UIControlEventTouchUpInside];
 //    [view_nav addSubview:btn_get];
     
-    view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 44, 320, 415)];
+    view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 915)];
     view_content.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_content];
     
-    UIImageView *imgView_background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 380)];
-    imgView_background.image = [UIImage imageNamed:@"bookshelf.png"];
+    UIImageView *imgView_background = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 768, 915)];
+    imgView_background.image = [UIImage imageNamed:@"bookshelf_ipad.png"];
     [view_content addSubview:imgView_background];
     
     arr_buttons = [[NSMutableArray alloc] init];
@@ -97,7 +97,7 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     NSString *str_shouldRequest = [app.arr_shouldRequest objectAtIndex:3];
     if ([str_shouldRequest isEqualToString:@"0"]) {
         [self requestMagazineList];
@@ -134,7 +134,7 @@
         [arr_magazine replaceObjectAtIndex:i withObject:dic_newInfo];
         int row = i/4;
         int col = i%4;
-        btn_magazine.frame = CGRectMake(28+73*col, 10+93*row, 45, 65);
+        btn_magazine.frame = CGRectMake(83+171*col, 10+180*row, 88, 132);
         UIImage *img;
         NSString *str_address = [dic_newInfo objectForKey:@"address"];
         NSString *str_imgAddress = [dic_newInfo objectForKey:@"coverImgAddress"];
@@ -157,7 +157,7 @@
                 UIGraphicsEndImageContext();
             }
             else {
-                UIImage *image = [UIImage imageNamed:@"bookcover.png"];
+                UIImage *image = [UIImage imageNamed:@"magazineCover_ipad.png"];
                 UIGraphicsBeginImageContext(image.size);
                 [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height) blendMode:kCGBlendModeLuminosity alpha:0.6f]; 
                 //CGContextRef context = UIGraphicsGetCurrentContext();
@@ -249,7 +249,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -257,7 +257,8 @@
 -(NSString *)magazineListRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetMagazine"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -266,6 +267,9 @@
 -(void)requestCover:(NSDictionary *)info
 {
     NSString *str_imgUrl = [info objectForKey:@"coverImgUrl"];
+    if ([str_imgUrl length] == 0) {
+        return;
+    }
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_imgUrl]];
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:url];
@@ -284,7 +288,7 @@
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }

@@ -40,7 +40,7 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"imagesNav.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -62,15 +62,19 @@
     sclView_item.showsHorizontalScrollIndicator = NO;
     [self.view addSubview:sclView_item];
     
-    sclView_imgList = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-    sclView_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
-    sclView_imgList.delegate = self;
-    sclView_imgList.directionalLockEnabled = YES;
-    [self.view addSubview:sclView_imgList];
+    view_imgList = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
+    view_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+    [self.view addSubview:view_imgList];
     
     UIView *view_topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     view_topBar.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"emptyNav.png"]];
-    [sclView_imgList addSubview:view_topBar];
+    [view_imgList addSubview:view_topBar];
+    
+    sclView_imgList = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
+    sclView_imgList.backgroundColor = [UIColor clearColor];
+    sclView_imgList.delegate = self;
+    sclView_imgList.directionalLockEnabled = YES;
+    [view_imgList addSubview:sclView_imgList];
     
     UILabel *lb_topBarTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     lb_topBarTitle.backgroundColor = [UIColor clearColor];
@@ -236,7 +240,7 @@
         [self refreshView];
     }
     
-    [self.view bringSubviewToFront:sclView_imgList];
+    [self.view bringSubviewToFront:view_imgList];
 }
 
 - (void)viewDidLoad
@@ -491,7 +495,7 @@
     [self refreshImgListView];
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.6f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:sclView_imgList cache:NO];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:view_imgList cache:NO];
     [self showImgList];
     [UIView commitAnimations];
 }
@@ -500,25 +504,33 @@
 {
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.6f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:sclView_imgList cache:NO];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:view_imgList cache:NO];
     [self hideImgList];
     [UIView commitAnimations];
 }
 
 -(void)hideImgList
 {
-    sclView_imgList.hidden = YES;
-    NSArray *arr_views = [sclView_imgList subviews];
+    view_imgList.hidden = YES;
+    NSArray *arr_views = [view_imgList subviews];
     for (UIView *view in arr_views) {
+        view.hidden = YES;
+    }
+    NSArray *arr_views1 = [sclView_imgList subviews];
+    for (UIView *view in arr_views1) {
         view.hidden = YES;
     }
 }
 
 -(void)showImgList
 {
-    sclView_imgList.hidden = NO;
-    NSArray *arr_views = [sclView_imgList subviews];
+    view_imgList.hidden = NO;
+    NSArray *arr_views = [view_imgList subviews];
     for (UIView *view in arr_views) {
+        view.hidden = NO;
+    }
+    NSArray *arr_views1 = [sclView_imgList subviews];
+    for (UIView *view in arr_views1) {
         view.hidden = NO;
     }
 }
@@ -748,10 +760,10 @@
 -(NSString *)detailRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetImageDetail"];
-
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     //NSString *str_id = [dic_detail objectForKey:@"id"];
     DDXMLNode *node_id = [DDXMLNode elementWithName:@"ID" stringValue:str_id];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_id,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_id,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];

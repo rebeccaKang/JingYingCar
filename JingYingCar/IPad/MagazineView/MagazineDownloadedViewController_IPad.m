@@ -37,7 +37,7 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"magazineNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -116,7 +116,7 @@
     [request setUserInfo:dic_userInfo];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }

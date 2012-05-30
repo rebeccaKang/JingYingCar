@@ -29,7 +29,7 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     view_nav.layer.shadowOffset = CGSizeMake(0, 1);
     view_nav.layer.shadowOpacity = 0.8;
@@ -37,48 +37,59 @@
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"moreNav.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"moreNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
-    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    UIView *view_header = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 45)];
+    view_header.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"moreHeader_ipad.png"]];
+    [self.view addSubview:view_header];
+    
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 90, 768, 870)];
+    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blackBackground_ipad.png"]];
     [self.view addSubview:view_content];
     
     arr_list = [[NSMutableArray alloc] init];
-    arr_listID = [[NSArray alloc] initWithArray:[[SqlManager sharedManager] getCollectionList] copyItems:YES];
-    for (int i = 0; i < [arr_listID count]; i++) {
-        NSDictionary *dic_collectionID = [arr_listID objectAtIndex:i];
-        NSString *str_fatherID = [dic_collectionID objectForKey:@"fatherID"];
-        NSString *str_childeID = [dic_collectionID objectForKey:@"childID"];
-        NSDictionary *dic_collection;
-        switch ([str_fatherID intValue]) {
-            case 0:
-            {
-                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getNewsListWithID:str_childeID]];
-            }
-                break;
-            case 1:
-            {
-                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getImageListWithID:str_childeID]];
-            }
-                break;
-            case 2:
-            {
-                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getTopicListWithID:str_childeID]];
-            }
-                break;
-            default:
-                break;
-        }
-        [arr_list addObject:dic_collection];
-    }
+    arr_listID = [[NSArray alloc] init];
+//    for (int i = 0; i < [arr_listID count]; i++) {
+//        NSDictionary *dic_collectionID = [arr_listID objectAtIndex:i];
+//        NSString *str_fatherID = [dic_collectionID objectForKey:@"fatherID"];
+//        NSString *str_childeID = [dic_collectionID objectForKey:@"childID"];
+//        NSDictionary *dic_collection;
+//        switch ([str_fatherID intValue]) {
+//            case 0:
+//            {
+//                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getNewsListWithID:str_childeID]];
+//            }
+//                break;
+//            case 1:
+//            {
+//                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getImageListWithID:str_childeID]];
+//            }
+//                break;
+//            case 2:
+//            {
+//                dic_collection = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getTopicListWithID:str_childeID]];
+//            }
+//                break;
+//            default:
+//                break;
+//        }
+//        [arr_list addObject:dic_collection];
+//    }
     
-    tbl_list = [[UITableView alloc] initWithFrame:view_content.bounds style:UITableViewStylePlain];
-    tbl_list.separatorStyle = UITableViewCellSeparatorStyleNone;
-    tbl_list.backgroundColor = [UIColor clearColor];
-    tbl_list.delegate = self;
-    tbl_list.dataSource = self;
-    [view_content addSubview:tbl_list];
+    sclView_imgList = [[UIScrollView alloc] initWithFrame:view_content.bounds];
+    sclView_imgList.contentSize = view_content.frame.size;
+    sclView_imgList.pagingEnabled = NO;
+    sclView_imgList.directionalLockEnabled = YES;
+    sclView_imgList.delegate = self;
+    [view_content addSubview:sclView_imgList];
+    
+//    tbl_list = [[UITableView alloc] initWithFrame:view_content.bounds style:UITableViewStylePlain];
+//    tbl_list.separatorStyle = UITableViewCellSeparatorStyleNone;
+//    tbl_list.backgroundColor = [UIColor clearColor];
+//    tbl_list.delegate = self;
+//    tbl_list.dataSource = self;
+//    [view_content addSubview:tbl_list];
     
     [self.view bringSubviewToFront:view_nav];
 }
@@ -102,9 +113,7 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    if (tbl_list != nil) {
-        [self reload];
-    }
+    [self reload];
 }
 
 -(void)reload
@@ -137,7 +146,70 @@
         }
         [arr_list addObject:dic_collection];
     }
-    [tbl_list reloadData];
+    for (int i = 0; i < [arr_list count]; i++) {
+        NSDictionary *dic_info = [arr_list objectAtIndex:i];
+        NSString *str_id = [dic_info objectForKey:@"id"];
+        NSString *str_title = [dic_info objectForKey:@"title"];
+        NSString *str_summary = [dic_info objectForKey:@"summary"];
+        NSString *str_time = [dic_info objectForKey:@"createTime"];
+        NSString *str_smallImgAddress = [dic_info objectForKey:@"smallImgAddress"];
+        
+        int row = i/2;
+        int col = i%2;
+        UIImage *img;
+        if ([str_smallImgAddress length] > 0) {
+            img = [UIImage imageWithContentsOfFile:str_smallImgAddress]; 
+        }
+        CustomImageView_IPad *imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(16+376*col, 16+216*row, 360, 200) withID:str_id img:img];
+        [sclView_imgList addSubview:imgView];
+        
+        UIImageView *imgView_arrow = [[UIImageView alloc] initWithFrame:CGRectMake(315, 5, 40, 40)];
+        imgView_arrow.image = [UIImage imageNamed:@"arrow_ipad.png"];
+        [imgView addSubview:imgView_arrow];
+        
+        UIView *view_summary = [[UIView alloc] initWithFrame:CGRectMake(0, 120, 360, 80)];
+        view_summary.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8f];
+        [imgView addSubview:view_summary];
+        
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 360, 30)];
+        lb_title.backgroundColor = [UIColor clearColor];
+        lb_title.font = [UIFont boldSystemFontOfSize:20];
+        lb_title.textColor = [UIColor whiteColor];
+        lb_title.text = str_title;
+        [view_summary addSubview:lb_title];
+        
+        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(0, 30, 360, 25)];
+        lb_summary.backgroundColor = [UIColor clearColor];
+        lb_summary.font = [UIFont boldSystemFontOfSize:17];
+        lb_summary.textColor = [UIColor whiteColor];
+        lb_summary.text = str_summary;
+        [view_summary addSubview:lb_summary];
+        
+        UILabel *lb_time = [[UILabel alloc] initWithFrame:CGRectMake(0, 55, 360, 25)];
+        lb_time.backgroundColor = [UIColor clearColor];
+        lb_time.font = [UIFont boldSystemFontOfSize:17];
+        lb_time.textColor = [UIColor colorWithRed:0.196f green:0.008f blue:0.486f alpha:1];
+        lb_time.text = [str_time substringToIndex:10];
+        [view_summary addSubview:lb_time];
+        
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapImage:)];
+        tap.numberOfTapsRequired = 1;
+        tap.numberOfTouchesRequired = 1;
+        tap.delegate = self;
+        [imgView addGestureRecognizer:tap];
+    }
+}
+
+#pragma mark - gestureDelegate
+-(void)tapImage:(id)sender
+{
+    UITapGestureRecognizer *tap = (UITapGestureRecognizer *)sender;
+    CustomImageView_IPad *imgView = (CustomImageView_IPad *)tap.view;
+    TopicDetailViewController_IPad *con_detail = [[TopicDetailViewController_IPad alloc] init];
+    
+    con_detail.str_id = imgView.str_id;
+    
+    [self.navigationController pushViewController:con_detail animated:YES]; 
 }
 
 #pragma mark - Table view data source

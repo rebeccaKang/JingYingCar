@@ -21,5 +21,7 @@
     WBEngine *SinaEngine;
 }
 
+-(void)show;
+
 @end
 

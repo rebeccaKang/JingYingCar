@@ -66,129 +66,257 @@ static BOOL WBIsDeviceIPad()
 
 - (id)initWithAppKey:(NSString *)appKey appSecret:(NSString *)appSecret text:(NSString *)text image:(UIImage *)image
 {
-    if (self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])
-    {
-        engine = [[WBEngine alloc] initWithAppKey:appKey appSecret:appSecret];
-        [engine setDelegate:self];
-        
-        // background settings
-        [self setBackgroundColor:[UIColor clearColor]];
-        [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-        
-        // add the panel view
-        panelView = [[UIView alloc] initWithFrame:CGRectMake(16, 73, 288, 335)];
-        panelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 288, 335)];
-        [panelImageView setImage:[[UIImage imageNamed:@"bg.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:18]];
-        
-        [panelView addSubview:panelImageView];
-        [self addSubview:panelView];
-        
-        // add the buttons & labels
-		closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		[closeButton setShowsTouchWhenHighlighted:YES];
-		[closeButton setFrame:CGRectMake(15, 13, 48, 30)];
-		[closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-		[closeButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
-		[closeButton setTitle:NSLocalizedString(@"关闭", nil) forState:UIControlStateNormal];
-		[closeButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
-		[closeButton addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
-		[panelView addSubview:closeButton];
-        
-        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 12, 140, 30)];
-        [titleLabel setText:NSLocalizedString(@"新浪微博", nil)];
-        [titleLabel setTextColor:[UIColor blackColor]];
-        [titleLabel setBackgroundColor:[UIColor clearColor]];
-        [titleLabel setTextAlignment:UITextAlignmentCenter];
-        [titleLabel setCenter:CGPointMake(144, 27)];
-        [titleLabel setShadowOffset:CGSizeMake(0, 1)];
-		[titleLabel setShadowColor:[UIColor whiteColor]];
-        [titleLabel setFont:[UIFont systemFontOfSize:19]];
-		[panelView addSubview:titleLabel];
-        
-        sendButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		[sendButton setShowsTouchWhenHighlighted:YES];
-		[sendButton setFrame:CGRectMake(288 - 15 - 48, 13, 48, 30)];
-		[sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-		[sendButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
-		[sendButton setTitle: NSLocalizedString(@"发送", nil) forState:UIControlStateNormal];
-		[sendButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
-		[sendButton addTarget:self action:@selector(onSendButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
-		[panelView addSubview:sendButton];
-        
-        contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(13, 60, 288 - 26, 150)];
-		[contentTextView setEditable:YES];
-		[contentTextView setDelegate:self];
-        [contentTextView setText:text];
-		[contentTextView setBackgroundColor:[UIColor clearColor]];
-		[contentTextView setFont:[UIFont systemFontOfSize:16]];
- 		[panelView addSubview:contentTextView];
-        
-        wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 190, 30, 30)];
-		[wordCountLabel setBackgroundColor:[UIColor clearColor]];
-		[wordCountLabel setTextColor:[UIColor darkGrayColor]];
-		[wordCountLabel setFont:[UIFont systemFontOfSize:16]];
-		[wordCountLabel setTextAlignment:UITextAlignmentCenter];
-		[panelView addSubview:wordCountLabel];
-        
-        clearTextButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		[clearTextButton setShowsTouchWhenHighlighted:YES];
-		[clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
-		[clearTextButton setContentMode:UIViewContentModeCenter];
- 		[clearTextButton setImage:[UIImage imageNamed:@"delete.png"] forState:UIControlStateNormal];
-		[clearTextButton addTarget:self action:@selector(onClearTextButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
-		[panelView addSubview:clearTextButton];
-        
-        // calculate the text length
-        [self calculateTextLength];
-        
-        self.contentText = contentTextView.text;
-        
-        // image(if attachted)
-        if (image)
+    if (IS_IPAD) {
+        if (self = [super initWithFrame:CGRectMake(0, 0, 768, 1024)])
         {
-			CGSize imageSize = image.size;	
-            CGFloat width = imageSize.width;
-			CGFloat height = imageSize.height;
-			CGRect tframe = CGRectMake(0, 0, 0, 0);
-			if (width > height) {
-				tframe.size.width = 120;
-				tframe.size.height = height * (120 / width);
-			}
-			else {
-				tframe.size.height = 80;
-				tframe.size.width = width * (80 / height);
-			}
-			
-			contentImageView = [[UIImageView alloc] initWithFrame:tframe];
-			[contentImageView setImage:image];
-			[contentImageView setCenter:CGPointMake(144, 260)];
-			
-			CALayer *layer = [contentImageView layer];
-			[layer setBorderColor:[[UIColor whiteColor] CGColor]];
-			[layer setBorderWidth:5.0f];
-			
-			[contentImageView.layer setShadowColor:[UIColor blackColor].CGColor];
-            [contentImageView.layer setShadowOffset:CGSizeMake(0, 0)];
-            [contentImageView.layer setShadowOpacity:0.5]; 
-            [contentImageView.layer setShadowRadius:3.0];
-			
-			
-			[panelView addSubview:contentImageView];
- 			
-			clearImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-			[clearImageButton setShowsTouchWhenHighlighted:YES];
-			[clearImageButton setFrame:CGRectMake(0, 0, 30, 30)];
-			[clearImageButton setContentMode:UIViewContentModeCenter];
-			[clearImageButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
-			[clearImageButton addTarget:self action:@selector(onClearImageButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
-			[clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
-                                                    contentImageView.center.y - contentImageView.frame.size.height / 2)];
-            [panelView addSubview:clearImageButton];
+            engine = [[WBEngine alloc] initWithAppKey:appKey appSecret:appSecret];
+            [engine setDelegate:self];
             
+            // background settings
+            [self setBackgroundColor:[UIColor clearColor]];
+            [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
             
-            self.contentImage = image;
+            // add the panel view
+            panelView = [[UIView alloc] initWithFrame:CGRectMake(30, 95, 708, 834)];
+            panelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 708, 734)];
+            [panelImageView setImage:[[UIImage imageNamed:@"bg.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:18]];
+            
+            [panelView addSubview:panelImageView];
+            [self addSubview:panelView];
+            
+            // add the buttons & labels
+            closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [closeButton setShowsTouchWhenHighlighted:YES];
+            [closeButton setFrame:CGRectMake(30, 20, 48, 30)];
+            [closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [closeButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
+            [closeButton setTitle:NSLocalizedString(@"关闭", nil) forState:UIControlStateNormal];
+            [closeButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
+            [closeButton addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:closeButton];
+            
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 20, 568, 30)];
+            [titleLabel setText:NSLocalizedString(@"新浪微博", nil)];
+            [titleLabel setTextColor:[UIColor blackColor]];
+            [titleLabel setBackgroundColor:[UIColor clearColor]];
+            [titleLabel setTextAlignment:UITextAlignmentCenter];
+            [titleLabel setCenter:CGPointMake(284, 27)];
+            [titleLabel setShadowOffset:CGSizeMake(0, 1)];
+            [titleLabel setShadowColor:[UIColor whiteColor]];
+            [titleLabel setFont:[UIFont systemFontOfSize:24]];
+            [panelView addSubview:titleLabel];
+            
+            sendButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [sendButton setShowsTouchWhenHighlighted:YES];
+            [sendButton setFrame:CGRectMake(625, 20, 48, 30)];
+            [sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [sendButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
+            [sendButton setTitle: NSLocalizedString(@"发送", nil) forState:UIControlStateNormal];
+            [sendButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
+            [sendButton addTarget:self action:@selector(onSendButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:sendButton];
+            
+            contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(30, 65, 648, 450)];
+            [contentTextView setEditable:YES];
+            [contentTextView setDelegate:self];
+            [contentTextView setText:text];
+            [contentTextView setBackgroundColor:[UIColor clearColor]];
+            [contentTextView setFont:[UIFont systemFontOfSize:16]];
+            [panelView addSubview:contentTextView];
+            
+            wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 190, 30, 30)];
+            [wordCountLabel setBackgroundColor:[UIColor clearColor]];
+            [wordCountLabel setTextColor:[UIColor darkGrayColor]];
+            [wordCountLabel setFont:[UIFont systemFontOfSize:16]];
+            [wordCountLabel setTextAlignment:UITextAlignmentCenter];
+            [panelView addSubview:wordCountLabel];
+            
+            clearTextButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [clearTextButton setShowsTouchWhenHighlighted:YES];
+            [clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
+            [clearTextButton setContentMode:UIViewContentModeCenter];
+            [clearTextButton setImage:[UIImage imageNamed:@"delete.png"] forState:UIControlStateNormal];
+            [clearTextButton addTarget:self action:@selector(onClearTextButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:clearTextButton];
+            
+            // calculate the text length
+            [self calculateTextLength];
+            
+            self.contentText = contentTextView.text;
+            
+            // image(if attachted)
+            if (image)
+            {
+                CGSize imageSize = image.size;	
+                CGFloat width = imageSize.width;
+                CGFloat height = imageSize.height;
+                CGRect tframe = CGRectMake(0, 0, 0, 0);
+                if (width > height) {
+                    tframe.size.width = 400;
+                    tframe.size.height = height * (400 / width);
+                }
+                else {
+                    tframe.size.height = 300;
+                    tframe.size.width = width * (300 / height);
+                }
+                
+                contentImageView = [[UIImageView alloc] initWithFrame:tframe];
+                [contentImageView setImage:image];
+                [contentImageView setCenter:CGPointMake(334, 680)];
+                
+                CALayer *layer = [contentImageView layer];
+                [layer setBorderColor:[[UIColor whiteColor] CGColor]];
+                [layer setBorderWidth:5.0f];
+                
+                [contentImageView.layer setShadowColor:[UIColor blackColor].CGColor];
+                [contentImageView.layer setShadowOffset:CGSizeMake(0, 0)];
+                [contentImageView.layer setShadowOpacity:0.5]; 
+                [contentImageView.layer setShadowRadius:3.0];
+                
+                
+                [panelView addSubview:contentImageView];
+                
+                clearImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [clearImageButton setShowsTouchWhenHighlighted:YES];
+                [clearImageButton setFrame:CGRectMake(0, 0, 30, 30)];
+                [clearImageButton setContentMode:UIViewContentModeCenter];
+                [clearImageButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+                [clearImageButton addTarget:self action:@selector(onClearImageButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+                [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                        contentImageView.center.y - contentImageView.frame.size.height / 2)];
+                [panelView addSubview:clearImageButton];
+                
+                
+                self.contentImage = image;
+            }
+            
         }
-        
+    }
+    else {
+        if (self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])
+        {
+            engine = [[WBEngine alloc] initWithAppKey:appKey appSecret:appSecret];
+            [engine setDelegate:self];
+            
+            // background settings
+            [self setBackgroundColor:[UIColor clearColor]];
+            [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+            
+            // add the panel view
+            panelView = [[UIView alloc] initWithFrame:CGRectMake(16, 73, 288, 335)];
+            panelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 288, 335)];
+            [panelImageView setImage:[[UIImage imageNamed:@"bg.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:18]];
+            
+            [panelView addSubview:panelImageView];
+            [self addSubview:panelView];
+            
+            // add the buttons & labels
+            closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [closeButton setShowsTouchWhenHighlighted:YES];
+            [closeButton setFrame:CGRectMake(15, 13, 48, 30)];
+            [closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [closeButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
+            [closeButton setTitle:NSLocalizedString(@"关闭", nil) forState:UIControlStateNormal];
+            [closeButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
+            [closeButton addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:closeButton];
+            
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 12, 140, 30)];
+            [titleLabel setText:NSLocalizedString(@"新浪微博", nil)];
+            [titleLabel setTextColor:[UIColor blackColor]];
+            [titleLabel setBackgroundColor:[UIColor clearColor]];
+            [titleLabel setTextAlignment:UITextAlignmentCenter];
+            [titleLabel setCenter:CGPointMake(144, 27)];
+            [titleLabel setShadowOffset:CGSizeMake(0, 1)];
+            [titleLabel setShadowColor:[UIColor whiteColor]];
+            [titleLabel setFont:[UIFont systemFontOfSize:19]];
+            [panelView addSubview:titleLabel];
+            
+            sendButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [sendButton setShowsTouchWhenHighlighted:YES];
+            [sendButton setFrame:CGRectMake(288 - 15 - 48, 13, 48, 30)];
+            [sendButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            [sendButton setBackgroundImage:[UIImage imageNamed:@"btn.png"] forState:UIControlStateNormal];
+            [sendButton setTitle: NSLocalizedString(@"发送", nil) forState:UIControlStateNormal];
+            [sendButton.titleLabel setFont:[UIFont boldSystemFontOfSize:13.0f]];
+            [sendButton addTarget:self action:@selector(onSendButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:sendButton];
+            
+            contentTextView = [[UITextView alloc] initWithFrame:CGRectMake(13, 60, 288 - 26, 150)];
+            [contentTextView setEditable:YES];
+            [contentTextView setDelegate:self];
+            [contentTextView setText:text];
+            [contentTextView setBackgroundColor:[UIColor clearColor]];
+            [contentTextView setFont:[UIFont systemFontOfSize:16]];
+            [panelView addSubview:contentTextView];
+            
+            wordCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 190, 30, 30)];
+            [wordCountLabel setBackgroundColor:[UIColor clearColor]];
+            [wordCountLabel setTextColor:[UIColor darkGrayColor]];
+            [wordCountLabel setFont:[UIFont systemFontOfSize:16]];
+            [wordCountLabel setTextAlignment:UITextAlignmentCenter];
+            [panelView addSubview:wordCountLabel];
+            
+            clearTextButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            [clearTextButton setShowsTouchWhenHighlighted:YES];
+            [clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
+            [clearTextButton setContentMode:UIViewContentModeCenter];
+            [clearTextButton setImage:[UIImage imageNamed:@"delete.png"] forState:UIControlStateNormal];
+            [clearTextButton addTarget:self action:@selector(onClearTextButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:clearTextButton];
+            
+            // calculate the text length
+            [self calculateTextLength];
+            
+            self.contentText = contentTextView.text;
+            
+            // image(if attachted)
+            if (image)
+            {
+                CGSize imageSize = image.size;	
+                CGFloat width = imageSize.width;
+                CGFloat height = imageSize.height;
+                CGRect tframe = CGRectMake(0, 0, 0, 0);
+                if (width > height) {
+                    tframe.size.width = 120;
+                    tframe.size.height = height * (120 / width);
+                }
+                else {
+                    tframe.size.height = 80;
+                    tframe.size.width = width * (80 / height);
+                }
+                
+                contentImageView = [[UIImageView alloc] initWithFrame:tframe];
+                [contentImageView setImage:image];
+                [contentImageView setCenter:CGPointMake(144, 260)];
+                
+                CALayer *layer = [contentImageView layer];
+                [layer setBorderColor:[[UIColor whiteColor] CGColor]];
+                [layer setBorderWidth:5.0f];
+                
+                [contentImageView.layer setShadowColor:[UIColor blackColor].CGColor];
+                [contentImageView.layer setShadowOffset:CGSizeMake(0, 0)];
+                [contentImageView.layer setShadowOpacity:0.5]; 
+                [contentImageView.layer setShadowRadius:3.0];
+                
+                
+                [panelView addSubview:contentImageView];
+                
+                clearImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+                [clearImageButton setShowsTouchWhenHighlighted:YES];
+                [clearImageButton setFrame:CGRectMake(0, 0, 30, 30)];
+                [clearImageButton setContentMode:UIViewContentModeCenter];
+                [clearImageButton setImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+                [clearImageButton addTarget:self action:@selector(onClearImageButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+                [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                        contentImageView.center.y - contentImageView.frame.size.height / 2)];
+                [panelView addSubview:clearImageButton];
+                
+                
+                self.contentImage = image;
+            }
+            
+        }
     }
     return self;
 }
@@ -269,58 +397,115 @@ static BOOL WBIsDeviceIPad()
                                        screenFrame.origin.x + ceil(screenFrame.size.width / 2),
                                        screenFrame.origin.y + ceil(screenFrame.size.height / 2));
 
-    if (UIInterfaceOrientationIsLandscape(orientation))
-    {
-        [self setFrame:CGRectMake(0, 0, 480, 320)];
-        [panelView setFrame:CGRectMake(16, 10, 480 - 32, 280)];
-        [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60 + 50)];
-        [contentImageView setCenter:CGPointMake(448 / 2, 155 + 60)];
-        [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
-                                                contentImageView.center.y - contentImageView.frame.size.height / 2)];
-    
-        [wordCountLabel setFrame:CGRectMake(224 + 90, 100 + 60, 30, 30)];
-        [clearTextButton setFrame:CGRectMake(224 + 120, 101 + 60, 30, 30)];
-        [panelImageView setFrame:CGRectMake(0, 0, 480 - 32, 280)];
-        [panelImageView setImage:[UIImage imageNamed:@"bg_land.png"]];
-        [sendButton setFrame:CGRectMake(480- 32 - 15 - 48, 13, 48, 30)];
-        [titleLabel setCenter:CGPointMake(448 / 2, 27)];
-    
-        if (isKeyboardShowing)
+    if (IS_IPAD) {
+        if (UIInterfaceOrientationIsLandscape(orientation))
         {
-            [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60)];
-            
-            [contentImageView setCenter:CGPointMake(448 / 2, 155)];
+            [self setFrame:CGRectMake(0, 0, 1024, 768)];
+            [panelView setFrame:CGRectMake(16, 10, 480 - 32, 280)];
+            [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60 + 50)];
+            [contentImageView setCenter:CGPointMake(448 / 2, 155 + 60)];
             [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
                                                     contentImageView.center.y - contentImageView.frame.size.height / 2)];
             
-            [wordCountLabel setFrame:CGRectMake(224 + 90, 100, 30, 30)];
-            [clearTextButton setFrame:CGRectMake(224 + 120, 101, 30, 30)];
+            [wordCountLabel setFrame:CGRectMake(224 + 90, 100 + 60, 30, 30)];
+            [clearTextButton setFrame:CGRectMake(224 + 120, 101 + 60, 30, 30)];
+            [panelImageView setFrame:CGRectMake(0, 0, 480 - 32, 280)];
+            [panelImageView setImage:[UIImage imageNamed:@"bg_land.png"]];
+            [sendButton setFrame:CGRectMake(480- 32 - 15 - 48, 13, 48, 30)];
+            [titleLabel setCenter:CGPointMake(448 / 2, 27)];
+            
+            if (isKeyboardShowing)
+            {
+                [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60)];
+                
+                [contentImageView setCenter:CGPointMake(448 / 2, 155)];
+                [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                        contentImageView.center.y - contentImageView.frame.size.height / 2)];
+                
+                [wordCountLabel setFrame:CGRectMake(224 + 90, 100, 30, 30)];
+                [clearTextButton setFrame:CGRectMake(224 + 120, 101, 30, 30)];
+            }
+            
         }
-    
-    }
-    else
-    {
-        [self setFrame:CGRectMake(0, 0, 320, 480)];
-        [panelView setFrame:CGRectMake(16, 73 - 10, 288, 335)];
-        
-        if(isKeyboardShowing)
+        else
         {
-            [panelView setFrame:CGRectMake(16, 73 - 10 - 51, 288, 335)];
+            [self setFrame:CGRectMake(0, 0, 768, 1024)];
+            [panelView setFrame:CGRectMake(30, 95, 708, 834)];
+            
+            if(isKeyboardShowing)
+            {
+                [panelView setFrame:CGRectMake(30, 95 - 10 - 51, 708, 834)];
+            }
+            
+            [contentTextView setFrame:CGRectMake(30, 65, 648, 450)];
+            [contentImageView setCenter:CGPointMake(334, 680)];
+            [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                    contentImageView.center.y - contentImageView.frame.size.height / 2)];
+            
+            [wordCountLabel setFrame:CGRectMake(210, 190, 30, 30)];
+            [clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
+            [panelImageView setFrame:CGRectMake(0, 0, 708, 834)];
+            [panelImageView setImage:[UIImage imageNamed:@"bg.png"]];
+            
+            [sendButton setFrame:CGRectMake(625, 20, 48, 30)];
+            [titleLabel setCenter:CGPointMake(284, 27)];
+            
         }
-        
-        [contentTextView setFrame:CGRectMake(13, 60, 288 - 26, 150)];
-        [contentImageView setCenter:CGPointMake(144, 260)];
-        [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
-                                                contentImageView.center.y - contentImageView.frame.size.height / 2)];
-        
-        [wordCountLabel setFrame:CGRectMake(210, 190, 30, 30)];
-        [clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
-        [panelImageView setFrame:CGRectMake(0, 0, 288, 335)];
-        [panelImageView setImage:[UIImage imageNamed:@"bg.png"]];
-        
-        [sendButton setFrame:CGRectMake(288 - 15 - 48, 13, 48, 30)];
-        [titleLabel setCenter:CGPointMake(144, 27)];
-    
+    }
+    else {
+        if (UIInterfaceOrientationIsLandscape(orientation))
+        {
+            [self setFrame:CGRectMake(0, 0, 480, 320)];
+            [panelView setFrame:CGRectMake(16, 10, 480 - 32, 280)];
+            [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60 + 50)];
+            [contentImageView setCenter:CGPointMake(448 / 2, 155 + 60)];
+            [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                    contentImageView.center.y - contentImageView.frame.size.height / 2)];
+            
+            [wordCountLabel setFrame:CGRectMake(224 + 90, 100 + 60, 30, 30)];
+            [clearTextButton setFrame:CGRectMake(224 + 120, 101 + 60, 30, 30)];
+            [panelImageView setFrame:CGRectMake(0, 0, 480 - 32, 280)];
+            [panelImageView setImage:[UIImage imageNamed:@"bg_land.png"]];
+            [sendButton setFrame:CGRectMake(480- 32 - 15 - 48, 13, 48, 30)];
+            [titleLabel setCenter:CGPointMake(448 / 2, 27)];
+            
+            if (isKeyboardShowing)
+            {
+                [contentTextView setFrame:CGRectMake(13, 50, 480 - 32 - 26, 60)];
+                
+                [contentImageView setCenter:CGPointMake(448 / 2, 155)];
+                [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                        contentImageView.center.y - contentImageView.frame.size.height / 2)];
+                
+                [wordCountLabel setFrame:CGRectMake(224 + 90, 100, 30, 30)];
+                [clearTextButton setFrame:CGRectMake(224 + 120, 101, 30, 30)];
+            }
+            
+        }
+        else
+        {
+            [self setFrame:CGRectMake(0, 0, 320, 480)];
+            [panelView setFrame:CGRectMake(16, 73 - 10, 288, 335)];
+            
+            if(isKeyboardShowing)
+            {
+                [panelView setFrame:CGRectMake(16, 73 - 10 - 51, 288, 335)];
+            }
+            
+            [contentTextView setFrame:CGRectMake(13, 60, 288 - 26, 150)];
+            [contentImageView setCenter:CGPointMake(144, 260)];
+            [clearImageButton setCenter:CGPointMake(contentImageView.center.x + contentImageView.frame.size.width / 2,
+                                                    contentImageView.center.y - contentImageView.frame.size.height / 2)];
+            
+            [wordCountLabel setFrame:CGRectMake(210, 190, 30, 30)];
+            [clearTextButton setFrame:CGRectMake(240, 191, 30, 30)];
+            [panelImageView setFrame:CGRectMake(0, 0, 288, 335)];
+            [panelImageView setImage:[UIImage imageNamed:@"bg.png"]];
+            
+            [sendButton setFrame:CGRectMake(288 - 15 - 48, 13, 48, 30)];
+            [titleLabel setCenter:CGPointMake(144, 27)];
+            
+        }
     }
     
     [self setCenter:screenCenter];

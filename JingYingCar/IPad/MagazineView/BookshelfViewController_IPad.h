@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import "AppDelegate_IPad.h"
 #import "MagazineUndownloadedViewController_IPad.h"
 
 @interface BookshelfViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource,MagazineEditDelegate>

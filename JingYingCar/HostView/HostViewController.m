@@ -70,7 +70,9 @@ static UIImage *barImage = nil;
     if ([arr_news count] == 0) {
         [self requestHotNews:@"before"];
     }
-    
+    else {
+        [self requestHotNews:@"later"];
+    }
     [self requestHotNewsTop];
 }
 
@@ -547,9 +549,10 @@ static UIImage *barImage = nil;
         strTime = [dateForm_time stringFromDate:time];
     }
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetHotNews"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
     DDXMLNode *node_direction = [DDXMLNode elementWithName:@"Direction" stringValue:str_direction];
     DDXMLNode *node_update = [DDXMLNode elementWithName:@"Update" stringValue:strTime];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_direction,node_update,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_direction,node_update,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -558,7 +561,8 @@ static UIImage *barImage = nil;
 -(NSString *)hotNewsTopRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetHotNewsTop"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];

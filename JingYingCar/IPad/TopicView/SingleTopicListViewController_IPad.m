@@ -126,7 +126,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -152,10 +152,11 @@
         strTime = [dateForm_time stringFromDate:time];
     }
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetOneTopicList"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
     DDXMLNode *node_fatherID = [DDXMLNode elementWithName:@"FatherID" stringValue:[NSString stringWithFormat:@"%d",type]];
     DDXMLNode *node_update = [DDXMLNode elementWithName:@"Update" stringValue:strTime];
     DDXMLNode *node_direction = [DDXMLNode elementWithName:@"Direction" stringValue:direction];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_fatherID,node_update,node_direction,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_fatherID,node_update,node_direction,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -185,7 +186,7 @@
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }

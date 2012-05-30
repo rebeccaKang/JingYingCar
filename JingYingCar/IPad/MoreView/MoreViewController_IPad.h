@@ -9,11 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate_IPad.h"
 
-@interface MoreViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface MoreViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource,UIGestureRecognizerDelegate>
 {
     NSMutableArray *arr_list;
     NSArray *arr_listID;
     UITableView *tbl_list;
+    
+    UIScrollView *sclView_imgList;
 }
 
 @end

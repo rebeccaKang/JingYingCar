@@ -29,12 +29,12 @@
     // If you use Interface Builder to create your views, then you must NOT override this method.
     [super loadView];
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 570, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"settingNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -47,7 +47,7 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 570, 415)];
     view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"settingAbout.png"]];
     [self.view addSubview:view_content];
     

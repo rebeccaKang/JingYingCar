@@ -32,17 +32,17 @@
     // If you create your views manually, you MUST override this method and use it to create your views.
     // If you use Interface Builder to create your views, then you must NOT override this method.
     arr_requests = [[NSMutableArray alloc] init];
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"hostNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
-    [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    [btn_back setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_back setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -50,44 +50,44 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 370)];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 915)];
     view_content.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_content];
     
-    UIView *view_bottom = [[UIView alloc] initWithFrame:CGRectMake(0, 415, 320, 45)];
-    view_bottom.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bottemNav.png"]];
+    UIView *view_bottom = [[UIView alloc] initWithFrame:CGRectMake(0, 960, 768, 45)];
+    view_bottom.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBottomNav_ipad.png"]];
     [self.view addSubview:view_bottom];
     
     UIButton *btn_share = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_share.frame = CGRectMake(20, 0, 45, 45);
-    [btn_share setBackgroundImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
-    [btn_share setBackgroundImage:[UIImage imageNamed:@"shareHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_share.frame = CGRectMake(200, 8, 28, 29);
+    [btn_share setBackgroundImage:[UIImage imageNamed:@"share_ipad.png"] forState:UIControlStateNormal];
+    //[btn_share setBackgroundImage:[UIImage imageNamed:@"shareHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_share addTarget:self action:@selector(showShareList) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_share];
     
     UIButton *btn_fontSmall = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_fontSmall.frame = CGRectMake(210, 10, 25, 25);
-    [btn_fontSmall setBackgroundImage:[UIImage imageNamed:@"fontSmall.png"] forState:UIControlStateNormal];
-    [btn_fontSmall setBackgroundImage:[UIImage imageNamed:@"topicHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_fontSmall.frame = CGRectMake(510, 8, 28, 29);
+    [btn_fontSmall setBackgroundImage:[UIImage imageNamed:@"fontSmall_ipad.png"] forState:UIControlStateNormal];
+    //[btn_fontSmall setBackgroundImage:[UIImage imageNamed:@"topicHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_fontSmall addTarget:self action:@selector(fontSmaller) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_fontSmall];
     
     UIButton *btn_fontLarge = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_fontLarge.frame = CGRectMake(260, 10, 25, 25);
-    [btn_fontLarge setBackgroundImage:[UIImage imageNamed:@"fontLarge.png"] forState:UIControlStateNormal];
-    [btn_fontLarge setBackgroundImage:[UIImage imageNamed:@"topicHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_fontLarge.frame = CGRectMake(560, 8, 28, 29);
+    [btn_fontLarge setBackgroundImage:[UIImage imageNamed:@"fontLarge_ipad.png"] forState:UIControlStateNormal];
+    //[btn_fontLarge setBackgroundImage:[UIImage imageNamed:@"topicHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_fontLarge addTarget:self action:@selector(fontLarger) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_fontLarge];
     
     UIButton *btn_collect = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_collect.frame = CGRectMake(285, 10, 25, 25);
+    btn_collect.frame = CGRectMake(723, 5, 35, 35);
     isCollected = [[SqlManager sharedManager] isCollected:str_id];
     if (isCollected == 0) {
-        [btn_collect setBackgroundImage:[UIImage imageNamed:@"uncollected.png"] forState:UIControlStateNormal];
+        [btn_collect setBackgroundImage:[UIImage imageNamed:@"uncollected_ipad.png"] forState:UIControlStateNormal];
     }
     else if(isCollected == 1)
     {
-        [btn_collect setBackgroundImage:[UIImage imageNamed:@"collect.png"] forState:UIControlStateNormal];
+        [btn_collect setBackgroundImage:[UIImage imageNamed:@"collected_ipad.png"] forState:UIControlStateNormal];
     }
     [btn_collect addTarget:self action:@selector(collect:) forControlEvents:UIControlEventTouchUpInside];
     [view_nav addSubview:btn_collect];
@@ -117,45 +117,43 @@
     str_class = [dic_info objectForKey:@"class"];
     NSString *str_isReaded = [dic_info objectForKey:@"isReaded"];
     if ([str_class intValue] == 1) {
-        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+        self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blackBackground_ipad.png"]];
         
         sclView_topic = [[UIScrollView alloc] initWithFrame:view_content.bounds];
         sclView_topic.backgroundColor = [UIColor clearColor];
         [view_content addSubview:sclView_topic];
         
-        lb_title = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 300, 60)];
-        lb_title.font = [UIFont boldSystemFontOfSize:18];
+        lb_title = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, 728, 60)];
+        lb_title.font = [UIFont boldSystemFontOfSize:28];
         lb_title.textAlignment = UITextAlignmentLeft;
         lb_title.backgroundColor = [UIColor clearColor];
         lb_title.textColor = [UIColor whiteColor];
         [sclView_topic addSubview:lb_title];
         
-        tv_content = [[UITextView alloc] initWithFrame:CGRectMake(0, 260, 320, 130)];
+        tv_content = [[UITextView alloc] initWithFrame:CGRectMake(20, 460, 728, 450)];
         
-        sclView_topic.contentSize = CGSizeMake(320, 60+200+tv_content.frame.size.height);
+        sclView_topic.contentSize = CGSizeMake(768, 60+400+tv_content.frame.size.height);
         
         tv_content.backgroundColor = [UIColor clearColor];
         tv_content.textColor = [UIColor whiteColor];
         tv_content.userInteractionEnabled = NO;
         [sclView_topic addSubview:tv_content];
         
-        imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 60, 320, 200)];
+        imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 60, 768, 400)];
         imgView.backgroundColor = [UIColor grayColor];
         [sclView_topic addSubview:imgView];
         
-        view_shareList = [[UIView alloc] initWithFrame:CGRectMake(0, 480, 320, 435)];
+        btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn_hideShare.backgroundColor = [UIColor clearColor];
+        btn_hideShare.frame = CGRectMake(0, 0, 768, 915);
+        [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
+        btn_hideShare.tag = 12;
+        btn_hideShare.enabled = NO;
+        [self.view addSubview:btn_hideShare];
+        
+        view_shareList = [[UIView alloc] initWithFrame:CGRectMake(50, 960, 332, 366)];
         view_shareList.backgroundColor = [UIColor clearColor];
         [self.view addSubview:view_shareList];
-        
-        UIView *view_share = [[UIView alloc] initWithFrame:CGRectMake(0, 265, 320, 150)];
-        view_share.backgroundColor = [UIColor clearColor];
-        [view_shareList addSubview:view_share];
-        
-        UIButton *btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_hideShare.backgroundColor = [UIColor clearColor];
-        btn_hideShare.frame = CGRectMake(0, 0, 320, 280);
-        [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
-        [view_shareList addSubview:btn_hideShare];
         
 //        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShareList)];
 //        tap.numberOfTapsRequired = 1;
@@ -163,25 +161,49 @@
 //        tap.delegate = self;
 //        [view_shareList addGestureRecognizer:tap];
         
-        UIImageView *imgView_bk = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shareBK.png"]];
-        imgView_bk.frame = view_share.bounds;
-        [view_share addSubview:imgView_bk];
+        UIImageView *imgView_bk = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shareBackground_ipad.png"]];
+        imgView_bk.frame = view_shareList.bounds;
+        [view_shareList addSubview:imgView_bk];
         
         UIButton *btn_sinaShare = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_sinaShare.frame = CGRectMake(21, 20, 278, 46);
+        btn_sinaShare.frame = CGRectMake(17, 100, 298, 54);
         //[btn_sinaShare setTitle:@"分享到新浪微博" forState:UIControlStateNormal];
-        [btn_sinaShare setBackgroundImage:[UIImage imageNamed:@"sinaShare.png"] forState:UIControlStateNormal];
+        [btn_sinaShare setBackgroundImage:[UIImage imageNamed:@"shareSina_ipad.png"] forState:UIControlStateNormal];
         [btn_sinaShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [btn_sinaShare addTarget:self action:@selector(showSinaShare) forControlEvents:UIControlEventTouchUpInside];
-        [view_share addSubview:btn_sinaShare];
+        [view_shareList addSubview:btn_sinaShare];
+        
+//        UIButton *btn_tecentShare = [UIButton buttonWithType:UIButtonTypeCustom];
+//        btn_tecentShare.frame = CGRectMake(17, 134, 298, 54);
+//        //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//        [btn_tecentShare setBackgroundImage:[UIImage imageNamed:@"shareTecent_ipad.png"] forState:UIControlStateNormal];
+//        [btn_tecentShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [btn_tecentShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//        [view_shareList addSubview:btn_tecentShare];
+//        
+//        UIButton *btn_sohuShare = [UIButton buttonWithType:UIButtonTypeCustom];
+//        btn_sohuShare.frame = CGRectMake(17, 208, 298, 54);
+//        //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//        [btn_sohuShare setBackgroundImage:[UIImage imageNamed:@"shareSohu_ipad.png"] forState:UIControlStateNormal];
+//        [btn_sohuShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [btn_sohuShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//        [view_shareList addSubview:btn_sohuShare];
+//        
+//        UIButton *btn_163Share = [UIButton buttonWithType:UIButtonTypeCustom];
+//        btn_163Share.frame = CGRectMake(17, 282, 298, 54);
+//        //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//        [btn_163Share setBackgroundImage:[UIImage imageNamed:@"share163_ipad.png"] forState:UIControlStateNormal];
+//        [btn_163Share setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [btn_163Share addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//        [view_shareList addSubview:btn_163Share];
         
         UIButton *btn_emailShare = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_emailShare.frame = CGRectMake(21, 86, 278, 46);
+        btn_emailShare.frame = CGRectMake(17, 200, 298, 54);
         //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
-        [btn_emailShare setBackgroundImage:[UIImage imageNamed:@"emailShare.png"] forState:UIControlStateNormal];
+        [btn_emailShare setBackgroundImage:[UIImage imageNamed:@"shareEmail_ipad.png"] forState:UIControlStateNormal];
         [btn_emailShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [btn_emailShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
-        [view_share addSubview:btn_emailShare];
+        [view_shareList addSubview:btn_emailShare];
         
 //        UIButton *btn_cancelShare = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 //        btn_cancelShare.frame = CGRectMake(10, 120, 300, 40);
@@ -215,7 +237,7 @@
     
     if ([str_isReaded isEqualToString:@"0"]) {
         imgView.frame = CGRectMake(0, 0, 0, 0);
-        tv_content.frame = CGRectMake(0, 60, 320, 330);
+        tv_content.frame = CGRectMake(0, 60, 768, 850);
         [self requestDetail];
     }
     else {
@@ -245,6 +267,9 @@
             [webView_detail loadRequest:request];
         }
     }
+    [self.view bringSubviewToFront:view_bottom];
+    
+    isShowShareList = NO;
 }
 
 - (void)viewDidLoad
@@ -317,7 +342,7 @@
 
 -(void)fontLarger
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     if (app.fontSize < 2) {
         app.fontSize ++;
     }
@@ -330,7 +355,7 @@
 
 -(void)fontSmaller
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     if (app.fontSize > 0) {
         app.fontSize --;
     }
@@ -343,17 +368,17 @@
 
 -(void)refreshView
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     UIFont *font;
     switch (app.fontSize) {
         case 0:
-            font = [UIFont systemFontOfSize:14];
+            font = [UIFont systemFontOfSize:20];
             break;
         case 1:
-            font = [UIFont systemFontOfSize:16];
+            font = [UIFont systemFontOfSize:24];
             break;
         case 2:
-            font = [UIFont systemFontOfSize:18];
+            font = [UIFont systemFontOfSize:28];
             break;
         default:
             break;
@@ -362,33 +387,42 @@
     [tv_content sizeToFit];
     if (imgView.image == nil) {
         imgView.frame = CGRectMake(0, 0, 0, 0);
-        tv_content.frame = CGRectMake(0, 60, 320, tv_content.contentSize.height);
-        sclView_topic.contentSize = CGSizeMake(320, tv_content.frame.size.height + 60);
+        tv_content.frame = CGRectMake(20, 60, 728, tv_content.contentSize.height);
+        sclView_topic.contentSize = CGSizeMake(768, tv_content.frame.size.height + 60);
     }
     else {
-        imgView.frame = CGRectMake(0, 60, 320, 200);
-        tv_content.frame = CGRectMake(0, 260, 320, tv_content.contentSize.height);
-        sclView_topic.contentSize = CGSizeMake(320, tv_content.frame.size.height + 200 + 60);
+        imgView.frame = CGRectMake(0, 60, 768, 400);
+        tv_content.frame = CGRectMake(20, 460, 728, tv_content.contentSize.height);
+        sclView_topic.contentSize = CGSizeMake(768, tv_content.frame.size.height + 400 + 60);
     }
 }
 
 -(void)showShareList
 {
-    CGRect originRect = view_shareList.frame;
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.4f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
-    view_shareList.frame = CGRectMake(originRect.origin.x, 45, originRect.size.width, originRect.size.height);
-    [UIView commitAnimations];
+    if (isShowShareList == NO) {
+        btn_hideShare.enabled = YES;
+        CGRect originRect = view_shareList.frame;
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.4f];
+        [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
+        view_shareList.frame = CGRectMake(originRect.origin.x, 589, originRect.size.width, originRect.size.height);
+        [UIView commitAnimations];
+        isShowShareList = YES;
+    }
+    else {
+        [self hideShareList];
+    }
 }
 
 -(void)hideShareList
 {
+    isShowShareList = NO;
+    btn_hideShare.enabled = NO;
     CGRect originRect = view_shareList.frame;
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.4f];
     [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
-    view_shareList.frame = CGRectMake(originRect.origin.x, 480, originRect.size.width, originRect.size.height);
+    view_shareList.frame = CGRectMake(originRect.origin.x, 960, originRect.size.width, originRect.size.height);
     [UIView commitAnimations];
 }
 
@@ -591,7 +625,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -611,8 +645,9 @@
         node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetTopicDetail"];
     }
     //NSString *str_id = [dic_detail objectForKey:@"id"];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
     DDXMLNode *node_id = [DDXMLNode elementWithName:@"ID" stringValue:str_id];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_id,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_id,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -641,7 +676,7 @@
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -760,8 +795,8 @@
                     break;
             }
         }
-        tv_content.frame = CGRectMake(0, 260, 320, 130);
-        imgView.frame = CGRectMake(0, 60, 320, 200);
+        tv_content.frame = CGRectMake(0, 460, 768, 450);
+        imgView.frame = CGRectMake(0, 60, 768, 400);
         imgView.image = img;
         
         [self refreshView];

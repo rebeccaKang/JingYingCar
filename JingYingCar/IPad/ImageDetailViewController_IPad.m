@@ -35,17 +35,17 @@
     arr_imgList = [[NSMutableArray alloc] initWithArray:[[SqlManager sharedManager] getImagesSeriesWithID:str_id]];
     NSDictionary *dic_info = [[NSDictionary alloc] initWithDictionary:[[SqlManager sharedManager] getImageListWithID:str_id] copyItems:YES];
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"imagesNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
-    [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    [btn_back setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_back setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -53,7 +53,7 @@
     btn_back.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_back];
     
-    sclView_item = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, 320, 370)];
+    sclView_item = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, 768, 915)];
     sclView_item.contentSize = sclView_item.frame.size;
     sclView_item.backgroundColor = [UIColor clearColor];
     sclView_item.directionalLockEnabled = YES;
@@ -62,15 +62,19 @@
     sclView_item.showsHorizontalScrollIndicator = NO;
     [self.view addSubview:sclView_item];
     
-    sclView_imgList = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 480)];
-    sclView_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+    view_imgList = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 915)];
+    view_imgList.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blackBackground_ipad.png"]];
+    [self.view addSubview:view_imgList];
+    
+    UIView *view_topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
+    view_topBar.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"emptyNav_ipad.png"]];
+    [view_imgList addSubview:view_topBar];
+    
+    sclView_imgList = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, 768, 915)];
+    sclView_imgList.backgroundColor = [UIColor clearColor];
     sclView_imgList.delegate = self;
     sclView_imgList.directionalLockEnabled = YES;
-    [self.view addSubview:sclView_imgList];
-    
-    UIView *view_topBar = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
-    view_topBar.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"emptyNav.png"]];
-    [sclView_imgList addSubview:view_topBar];
+    [view_imgList addSubview:sclView_imgList];
     
     UILabel *lb_topBarTitle = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
     lb_topBarTitle.backgroundColor = [UIColor clearColor];
@@ -83,21 +87,21 @@
     
     UIButton *btn_topBarBack = [UIButton buttonWithType:UIButtonTypeCustom];
     btn_topBarBack.frame = CGRectMake(5, 7, 50, 30);
-    [btn_topBarBack setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    [btn_topBarBack setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_topBarBack setTitle:@"返回" forState:UIControlStateNormal];
     [btn_topBarBack setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     btn_topBarBack.titleLabel.font = [UIFont boldSystemFontOfSize:16];
     [btn_topBarBack addTarget:self action:@selector(hideImgListView) forControlEvents:UIControlEventTouchUpInside];
     [view_topBar addSubview:btn_topBarBack];
     
-    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBackground.png"]];
+    self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blackBackground_ipad.png"]];
     
     [self hideImgList];
     
     for (int i = 0; i < [arr_imgList count]; i++) {
         NSMutableDictionary *dic_item = [[NSMutableDictionary alloc] initWithDictionary:[arr_imgList objectAtIndex:i]];
         NSString *str_imgID = [dic_item objectForKey:@"imgID"];
-        UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 370)];
+        UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(768*i, 0, 768, 915)];
         view_content.backgroundColor = [UIColor clearColor];
         [sclView_item addSubview:view_content];
         
@@ -106,7 +110,7 @@
         sclView_topic.directionalLockEnabled = YES;
         [view_content addSubview:sclView_topic];
         
-        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 768, 60)];
         lb_title.font = [UIFont boldSystemFontOfSize:20];
         lb_title.textAlignment = UITextAlignmentLeft;
         lb_title.backgroundColor = [UIColor clearColor];
@@ -114,9 +118,9 @@
         [sclView_topic addSubview:lb_title];
         [dic_item setObject:lb_title forKey:@"lb_title"];
         
-        UITextView *tv_content = [[UITextView alloc] initWithFrame:CGRectMake(0, 285, 320, 130)];
+        UITextView *tv_content = [[UITextView alloc] initWithFrame:CGRectMake(0, 682, 768, 315)];
         
-        sclView_topic.contentSize = CGSizeMake(320, 85+200+tv_content.frame.size.height);
+        sclView_topic.contentSize = CGSizeMake(768, 682+tv_content.frame.size.height);
         
         tv_content.backgroundColor = [UIColor clearColor];
         tv_content.textColor = [UIColor whiteColor];
@@ -124,89 +128,112 @@
         [sclView_topic addSubview:tv_content];
         [dic_item setObject:tv_content forKey:@"tv_content"];
         
-        CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(0, 85, 320, 200) withID:str_imgID img:nil];
+        CustomImageView_IPad *imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(0, 120, 768, 512) withID:str_imgID img:nil];
         //imgView.delegate = self;
         [sclView_topic addSubview:imgView];
         [dic_item setObject:imgView forKey:@"imgView"];
         [arr_imgList replaceObjectAtIndex:i withObject:dic_item];
     }
-    UIView *view_bottom = [[UIView alloc] initWithFrame:CGRectMake(0, 415, 320, 45)];
-    view_bottom.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"bottemNav.png"]];
+    UIView *view_bottom = [[UIView alloc] initWithFrame:CGRectMake(0, 960, 768, 45)];
+    view_bottom.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"topicBottomNav_ipad.png"]];
     [self.view addSubview:view_bottom];
     
     UIButton *btn_share = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_share.frame = CGRectMake(20, 0, 45, 45);
-    [btn_share setBackgroundImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
-    [btn_share setBackgroundImage:[UIImage imageNamed:@"shareHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_share.frame = CGRectMake(170, 8, 28, 29);
+    [btn_share setBackgroundImage:[UIImage imageNamed:@"share_ipad.png"] forState:UIControlStateNormal];
+    //[btn_share setBackgroundImage:[UIImage imageNamed:@"shareHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_share addTarget:self action:@selector(showShareList) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_share];
     
-    UIButton *btn_lastImg = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_lastImg.frame = CGRectMake(100, 0, 45, 45);
-    [btn_lastImg setBackgroundImage:[UIImage imageNamed:@"lastImg.png"] forState:UIControlStateNormal];
-    [btn_lastImg setBackgroundImage:[UIImage imageNamed:@"lastImgHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_lastImg = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_lastImg.frame = CGRectMake(320, 7.5f, 30, 30);
+    [btn_lastImg setBackgroundImage:[UIImage imageNamed:@"lastImg_ipad.png"] forState:UIControlStateNormal];
+    //[btn_lastImg setBackgroundImage:[UIImage imageNamed:@"lastImgHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_lastImg addTarget:self action:@selector(lastImg) forControlEvents:UIControlEventTouchUpInside];
+    btn_lastImg.enabled = NO;
     [view_bottom addSubview:btn_lastImg];
     
-    UIButton *btn_nextImg = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_nextImg.frame = CGRectMake(180, 0, 45, 45);
-    [btn_nextImg setBackgroundImage:[UIImage imageNamed:@"nextImg.png"] forState:UIControlStateNormal];
-    [btn_nextImg setBackgroundImage:[UIImage imageNamed:@"nextImgHighlighted.png"] forState:UIControlStateHighlighted];
+    btn_nextImg = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_nextImg.frame = CGRectMake(420,  7.5f, 30, 30);
+    [btn_nextImg setBackgroundImage:[UIImage imageNamed:@"nextImg_ipad.png"] forState:UIControlStateNormal];
+    //[btn_nextImg setBackgroundImage:[UIImage imageNamed:@"nextImgHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_nextImg addTarget:self action:@selector(nextImg) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_nextImg]; 
     
     UIButton *btn_imgDownload = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_imgDownload.frame = CGRectMake(260, 7, 30, 30);
-    [btn_imgDownload setBackgroundImage:[UIImage imageNamed:@"imgDownload.png"] forState:UIControlStateNormal];
+    btn_imgDownload.frame = CGRectMake(568, 7, 30, 30);
+    [btn_imgDownload setBackgroundImage:[UIImage imageNamed:@"imgDownload_ipad.png"] forState:UIControlStateNormal];
     //[btn_imgDownload setBackgroundImage:[UIImage imageNamed:@"nextImgHighlighted.png"] forState:UIControlStateHighlighted];
     [btn_imgDownload addTarget:self action:@selector(downloadToAlbum) forControlEvents:UIControlEventTouchUpInside];
     [view_bottom addSubview:btn_imgDownload]; 
     
     UIButton *btn_showTotal = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_showTotal.frame = CGRectMake(265, 7, 50, 30);
-    [btn_showTotal setBackgroundImage:[UIImage imageNamed:@"imagesListBtn.png"] forState:UIControlStateNormal];
+    btn_showTotal.frame = CGRectMake(708, 7, 50, 30);
+    [btn_showTotal setBackgroundImage:[UIImage imageNamed:@"imagesListBtn_ipad.png"] forState:UIControlStateNormal];
     [btn_showTotal addTarget:self action:@selector(showImgListView) forControlEvents:UIControlEventTouchUpInside];
     [view_nav addSubview:btn_showTotal];
     
-    view_shareList = [[UIView alloc] initWithFrame:CGRectMake(0, 480, 320, 435)];
+    btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_hideShare.backgroundColor = [UIColor clearColor];
+    btn_hideShare.frame = CGRectMake(0, 0, 768, 915);
+    [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
+    btn_hideShare.tag = 12;
+    btn_hideShare.enabled = NO;
+    [self.view addSubview:btn_hideShare];
+    
+    view_shareList = [[UIView alloc] initWithFrame:CGRectMake(20, 960, 332, 366)];
     view_shareList.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_shareList];
     
-    UIView *view_share = [[UIView alloc] initWithFrame:CGRectMake(0, 265, 320, 150)];
-    view_share.backgroundColor = [UIColor clearColor];
-    [view_shareList addSubview:view_share];
+    //        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShareList)];
+    //        tap.numberOfTapsRequired = 1;
+    //        tap.numberOfTouchesRequired = 1;
+    //        tap.delegate = self;
+    //        [view_shareList addGestureRecognizer:tap];
     
-    UIButton *btn_hideShare = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_hideShare.backgroundColor = [UIColor clearColor];
-    btn_hideShare.frame = CGRectMake(0, 0, 320, 280);
-    [btn_hideShare addTarget:self action:@selector(hideShareList) forControlEvents:UIControlEventTouchUpInside];
-    [view_shareList addSubview:btn_hideShare];
-    
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideShareList)];
-    tap.numberOfTapsRequired = 1;
-    tap.numberOfTouchesRequired = 1;
-    tap.delegate = self;
-    [view_shareList addGestureRecognizer:tap];
-    
-    UIImageView *imgView_bk = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shareBK.png"]];
-    imgView_bk.frame = view_share.bounds;
-    [view_share addSubview:imgView_bk];
+    UIImageView *imgView_bk = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shareBackground_ipad.png"]];
+    imgView_bk.frame = view_shareList.bounds;
+    [view_shareList addSubview:imgView_bk];
     
     UIButton *btn_sinaShare = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_sinaShare.frame = CGRectMake(21, 20, 278, 46);
+    btn_sinaShare.frame = CGRectMake(17, 100, 298, 54);
     //[btn_sinaShare setTitle:@"分享到新浪微博" forState:UIControlStateNormal];
-    [btn_sinaShare setBackgroundImage:[UIImage imageNamed:@"sinaShare.png"] forState:UIControlStateNormal];
+    [btn_sinaShare setBackgroundImage:[UIImage imageNamed:@"shareSina_ipad.png"] forState:UIControlStateNormal];
     [btn_sinaShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [btn_sinaShare addTarget:self action:@selector(showSinaShare) forControlEvents:UIControlEventTouchUpInside];
-    [view_share addSubview:btn_sinaShare];
+    [view_shareList addSubview:btn_sinaShare];
+    
+//    UIButton *btn_tecentShare = [UIButton buttonWithType:UIButtonTypeCustom];
+//    btn_tecentShare.frame = CGRectMake(17, 134, 298, 54);
+//    //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//    [btn_tecentShare setBackgroundImage:[UIImage imageNamed:@"shareTecent_ipad.png"] forState:UIControlStateNormal];
+//    [btn_tecentShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [btn_tecentShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//    [view_shareList addSubview:btn_tecentShare];
+//    
+//    UIButton *btn_sohuShare = [UIButton buttonWithType:UIButtonTypeCustom];
+//    btn_sohuShare.frame = CGRectMake(17, 208, 298, 54);
+//    //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//    [btn_sohuShare setBackgroundImage:[UIImage imageNamed:@"shareSohu_ipad.png"] forState:UIControlStateNormal];
+//    [btn_sohuShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [btn_sohuShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//    [view_shareList addSubview:btn_sohuShare];
+//    
+//    UIButton *btn_163Share = [UIButton buttonWithType:UIButtonTypeCustom];
+//    btn_163Share.frame = CGRectMake(17, 282, 298, 54);
+//    //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
+//    [btn_163Share setBackgroundImage:[UIImage imageNamed:@"share163_ipad.png"] forState:UIControlStateNormal];
+//    [btn_163Share setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    [btn_163Share addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
+//    [view_shareList addSubview:btn_163Share];
     
     UIButton *btn_emailShare = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_emailShare.frame = CGRectMake(21, 86, 278, 46);
+    btn_emailShare.frame = CGRectMake(17, 200, 298, 54);
     //[btn_emailShare setTitle:@"邮件分享此文章" forState:UIControlStateNormal];
-    [btn_emailShare setBackgroundImage:[UIImage imageNamed:@"emailShare.png"] forState:UIControlStateNormal];
+    [btn_emailShare setBackgroundImage:[UIImage imageNamed:@"shareEmail_ipad.png"] forState:UIControlStateNormal];
     [btn_emailShare setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [btn_emailShare addTarget:self action:@selector(showEmailShare) forControlEvents:UIControlEventTouchUpInside];
-    [view_share addSubview:btn_emailShare];
+    [view_shareList addSubview:btn_emailShare];
     
 //    UIButton *btn_cancelShare = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 //    btn_cancelShare.frame = CGRectMake(10, 120, 300, 40);
@@ -237,6 +264,7 @@
     }
     
     [self.view bringSubviewToFront:sclView_imgList];
+    [self.view bringSubviewToFront:view_bottom];
 }
 
 - (void)viewDidLoad
@@ -289,45 +317,19 @@
     }
 }
 
--(void)fontLarger
-{
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    if (app.fontSize < 2) {
-        app.fontSize ++;
-    }
-    NSMutableDictionary *dic_configure = [[NSMutableDictionary alloc] init];
-    [dic_configure setObject:[NSString stringWithFormat:@"%d",app.fontSize] forKey:@"fontSize"];
-    [dic_configure setObject:[NSString stringWithFormat:@"%d",app.bufferTime] forKey:@"bufferTime"];
-    [[SqlManager sharedManager] saveConfigure:dic_configure];
-    [self refreshView];
-}
-
--(void)fontSmaller
-{
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    if (app.fontSize > 0) {
-        app.fontSize --;
-    }
-    NSMutableDictionary *dic_configure = [[NSMutableDictionary alloc] init];
-    [dic_configure setObject:[NSString stringWithFormat:@"%d",app.fontSize] forKey:@"fontSize"];
-    [dic_configure setObject:[NSString stringWithFormat:@"%d",app.bufferTime] forKey:@"bufferTime"];
-    [[SqlManager sharedManager] saveConfigure:dic_configure];
-    [self refreshView];
-}
-
 -(void)refreshView
 {
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
     UIFont *font;
     switch (app.fontSize) {
         case 0:
-            font = [UIFont systemFontOfSize:14];
+            font = [UIFont systemFontOfSize:20];
             break;
         case 1:
-            font = [UIFont systemFontOfSize:16];
+            font = [UIFont systemFontOfSize:24];
             break;
         case 2:
-            font = [UIFont systemFontOfSize:18];
+            font = [UIFont systemFontOfSize:28];
             break;
         default:
             break;
@@ -344,15 +346,15 @@
         tv_content.text = [dic_item objectForKey:@"contentDetail"];
         tv_content.font = font;
         [tv_content sizeToFit];
-        tv_content.frame = CGRectMake(0, 285, 320, tv_content.contentSize.height);
+        tv_content.frame = CGRectMake(0, 682, 768, tv_content.contentSize.height);
         
         UIScrollView *sclView_topic = (UIScrollView *)tv_content.superview;
-        sclView_topic.contentSize = CGSizeMake(320, tv_content.frame.size.height + 200 + 85);
+        sclView_topic.contentSize = CGSizeMake(768, tv_content.frame.size.height + 682);
         
         UIView *view_content = sclView_topic.superview;
-        view_content.frame = CGRectMake(320*i, 0, 320, 370);
+        view_content.frame = CGRectMake(768*i, 0, 768, 915);
         
-        CustomImageView *imgView = [dic_item objectForKey:@"imgView"];
+        CustomImageView_IPad *imgView = [dic_item objectForKey:@"imgView"];
         UIImage *img;
         NSString *str_imgAddress = [dic_item objectForKey:@"largeImgAddress"];
         if ([str_imgAddress length] > 0) {
@@ -360,7 +362,7 @@
             imgView.img = img;
         }
     }
-    sclView_item.contentSize = CGSizeMake(320*[arr_imgList count], 370);
+    sclView_item.contentSize = CGSizeMake(768*[arr_imgList count], 915);
 }
 
 -(void)loadAllTopImage
@@ -387,21 +389,30 @@
 
 -(void)showShareList
 {
-    CGRect originRect = view_shareList.frame;
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:0.4f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
-    view_shareList.frame = CGRectMake(originRect.origin.x, 45, originRect.size.width, originRect.size.height);
-    [UIView commitAnimations];
+    if (isShowShareList == NO) {
+        btn_hideShare.enabled = YES;
+        CGRect originRect = view_shareList.frame;
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.4f];
+        [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
+        view_shareList.frame = CGRectMake(originRect.origin.x, 589, originRect.size.width, originRect.size.height);
+        [UIView commitAnimations];
+        isShowShareList = YES;
+    }
+    else {
+        [self hideShareList];
+    }
 }
 
 -(void)hideShareList
 {
+    isShowShareList = NO;
+    btn_hideShare.enabled = NO;
     CGRect originRect = view_shareList.frame;
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.4f];
     [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:view_shareList cache:NO];
-    view_shareList.frame = CGRectMake(originRect.origin.x, 480, originRect.size.width, originRect.size.height);
+    view_shareList.frame = CGRectMake(originRect.origin.x, 960, originRect.size.width, originRect.size.height);
     [UIView commitAnimations];
 }
 
@@ -473,7 +484,13 @@
 {
     int index = fabs(sclView_item.contentOffset.x) / sclView_item.frame.size.width;
     if (index < [arr_imgList count] -1) {
-        [sclView_item scrollRectToVisible:CGRectMake(320*(index+1), 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:YES];
+        [sclView_item scrollRectToVisible:CGRectMake(768*(index+1), 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:YES];
+        if (btn_lastImg.enabled == NO) {
+            btn_lastImg.enabled = YES;
+        }
+        if (index +1 == [arr_imgList count] -1) {
+            btn_nextImg.enabled = NO;
+        }
     }
 }
 
@@ -481,7 +498,13 @@
 {
     int index = fabs(sclView_item.contentOffset.x) / sclView_item.frame.size.width;
     if (index > 0) {
-        [sclView_item scrollRectToVisible:CGRectMake(320*(index - 1), 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:YES];
+        [sclView_item scrollRectToVisible:CGRectMake(768*(index - 1), 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:YES];
+        if (btn_nextImg.enabled == NO) {
+            btn_nextImg.enabled = YES;
+        }
+        if (index == 1) {
+            btn_lastImg.enabled = NO;
+        }
     }
 }
 
@@ -491,7 +514,7 @@
     [self refreshImgListView];
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.6f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:sclView_imgList cache:NO];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:view_imgList cache:NO];
     [self showImgList];
     [UIView commitAnimations];
 }
@@ -500,13 +523,14 @@
 {
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationDuration:0.6f];
-    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:sclView_imgList cache:NO];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:view_imgList cache:NO];
     [self hideImgList];
     [UIView commitAnimations];
 }
 
 -(void)hideImgList
 {
+    view_imgList.hidden = YES;
     sclView_imgList.hidden = YES;
     NSArray *arr_views = [sclView_imgList subviews];
     for (UIView *view in arr_views) {
@@ -516,6 +540,7 @@
 
 -(void)showImgList
 {
+    view_imgList.hidden = NO;
     sclView_imgList.hidden = NO;
     NSArray *arr_views = [sclView_imgList subviews];
     for (UIView *view in arr_views) {
@@ -527,11 +552,11 @@
 {
     for (int i = 0; i < [arr_imgList count]; i++) {
         NSMutableDictionary *dic_item = [arr_imgList objectAtIndex:i];
-        CustomImageView *imgView = (CustomImageView *)[dic_item objectForKey:@"smallImgView"];
+        CustomImageView_IPad *imgView = (CustomImageView_IPad *)[dic_item objectForKey:@"smallImgView"];
         if (imgView == nil) {
-            int row = i/3;
-            int col = i%3;
-            imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(5+col*105, 50+row*75, 100, 70) withID:[NSString stringWithFormat:@"%d",i] img:nil];
+            int row = i/2;
+            int col = i%2;
+            imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(16+col*376, 16+row*216, 360, 200) withID:[NSString stringWithFormat:@"%d",i] img:nil];
             //imgView.delegate = self;
             [sclView_imgList addSubview:imgView];
             [dic_item setObject:imgView forKey:@"smallImgView"];
@@ -548,15 +573,15 @@
         }
     }
     
-    int rows = [arr_imgList count]/3;
-    sclView_imgList.contentSize = CGSizeMake(320, 50+75*rows);
+    int rows = [arr_imgList count]/2 +1;
+    sclView_imgList.contentSize = CGSizeMake(768, 16+216*rows);
 }
 
 -(void)downloadToAlbum
 {
     int index = fabs(sclView_item.contentOffset.x) / sclView_item.frame.size.width;
     NSDictionary *dic_item = [arr_imgList objectAtIndex:index];
-    CustomImageView *imgView = (CustomImageView *)[dic_item objectForKey:@"imgView"];
+    CustomImageView_IPad *imgView = (CustomImageView_IPad *)[dic_item objectForKey:@"imgView"];
     if (imgView != nil) {
         if (imgView.img != nil) {
             UIImageWriteToSavedPhotosAlbum(imgView.img, self, @selector(completeDownloadToAlbumImage:didFinishSavingWithError:contextInfo:), nil);
@@ -582,10 +607,10 @@
 -(void)tapSmallImg:(UITapGestureRecognizer *)sender
 {
     [self hideImgListView];
-    CustomImageView *view = (CustomImageView *)sender.view;
+    CustomImageView_IPad *view = (CustomImageView_IPad *)sender.view;
     int index = [view.str_id intValue];
     NSLog(@"index:%d",index);
-    [sclView_item scrollRectToVisible:CGRectMake(320*index, 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:NO];
+    [sclView_item scrollRectToVisible:CGRectMake(768*index, 0, sclView_item.frame.size.width, sclView_item.frame.size.height) animated:NO];
 }
 
 #pragma mark - WBEngineDelegate Methods
@@ -740,7 +765,7 @@
     [request setPostBody:postData];
     [request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -748,10 +773,10 @@
 -(NSString *)detailRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetImageDetail"];
-
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"ipad"];
     //NSString *str_id = [dic_detail objectForKey:@"id"];
     DDXMLNode *node_id = [DDXMLNode elementWithName:@"ID" stringValue:str_id];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_id,nil];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,node_id,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -789,7 +814,7 @@
     //[request setPostBody:postData];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -856,7 +881,7 @@
                         if ([str_oldImgID isEqualToString:str_imgID]) {
                             UILabel *lb_title = (UILabel *)[dic_oldInfo objectForKey:@"lb_title"];
                             UITextView *tv_content = (UITextView *)[dic_oldInfo objectForKey:@"tv_content"];
-                            CustomImageView *imgView = (CustomImageView *)[dic_oldInfo objectForKey:@"imgView"];
+                            CustomImageView_IPad *imgView = (CustomImageView_IPad *)[dic_oldInfo objectForKey:@"imgView"];
                             [dic_newInfo setObject:lb_title forKey:@"lb_title"];
                             [dic_newInfo setObject:tv_content forKey:@"tv_content"];
                             [dic_newInfo setObject:imgView forKey:@"imgView"];
@@ -864,7 +889,7 @@
                     }
                 }
                 else if(result == 103) {
-                    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(320*[arr_imgList count], 45, 320, 370)];
+                    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(768*[arr_imgList count], 45, 768, 915)];
                     view_content.backgroundColor = [UIColor clearColor];
                     [sclView_item addSubview:view_content];
                     
@@ -873,7 +898,7 @@
                     sclView_topic.directionalLockEnabled = YES;
                     [view_content addSubview:sclView_topic];
                     
-                    UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+                    UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 768, 60)];
                     lb_title.font = [UIFont boldSystemFontOfSize:20];
                     lb_title.textAlignment = UITextAlignmentLeft;
                     lb_title.backgroundColor = [UIColor clearColor];
@@ -881,9 +906,9 @@
                     [sclView_topic addSubview:lb_title];
                     [dic_newInfo setObject:lb_title forKey:@"lb_title"];
                     
-                    UITextView *tv_content = [[UITextView alloc] initWithFrame:CGRectMake(0, 260, 320, 130)];
+                    UITextView *tv_content = [[UITextView alloc] initWithFrame:CGRectMake(0, 682, 768, 328)];
                     
-                    sclView_topic.contentSize = CGSizeMake(320, 60+200+tv_content.frame.size.height);
+                    sclView_topic.contentSize = CGSizeMake(768, 682+tv_content.frame.size.height);
                     
                     tv_content.backgroundColor = [UIColor clearColor];
                     tv_content.textColor = [UIColor whiteColor];
@@ -891,7 +916,7 @@
                     [sclView_topic addSubview:tv_content];
                     [dic_newInfo setObject:tv_content forKey:@"tv_content"];
                     
-                    CustomImageView *imgView = [[CustomImageView alloc] initWithFrame:CGRectMake(0, 85, 320, 200) withID:@"" img:nil];
+                    CustomImageView_IPad *imgView = [[CustomImageView_IPad alloc] initWithFrame:CGRectMake(0, 120, 768, 512) withID:@"" img:nil];
                     //imgView.delegate = self;
                     [sclView_topic addSubview:imgView];
                     [dic_newInfo setObject:imgView forKey:@"imgView"];
@@ -944,8 +969,8 @@
             if ([str_oldImgID isEqualToString:str_imgID]) {
                 UILabel *lb_title = (UILabel *)[dic_oldInfo objectForKey:@"lb_title"];
                 UITextView *tv_content = (UITextView *)[dic_oldInfo objectForKey:@"tv_content"];
-                CustomImageView *imgView = (CustomImageView *)[dic_oldInfo objectForKey:@"imgView"];
-                CustomImageView *imgView_small = (CustomImageView *)[dic_oldInfo objectForKey:@"smallImgView"];
+                CustomImageView_IPad *imgView = (CustomImageView_IPad *)[dic_oldInfo objectForKey:@"imgView"];
+                CustomImageView_IPad *imgView_small = (CustomImageView_IPad *)[dic_oldInfo objectForKey:@"smallImgView"];
                 [dic_newInfo setObject:lb_title forKey:@"lb_title"];
                 [dic_newInfo setObject:tv_content forKey:@"tv_content"];
                 [dic_newInfo setObject:imgView forKey:@"imgView"];

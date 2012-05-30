@@ -9,17 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate_IPad.h"
 
-@interface SearchViewController_IPad : UIViewController<UISearchBarDelegate,UISearchDisplayDelegate,UITableViewDelegate,UITableViewDataSource>
+@interface SearchViewController_IPad : UIViewController<UISearchBarDelegate,UISearchDisplayDelegate,UIScrollViewDelegate,UIGestureRecognizerDelegate>
 {
     UISearchBar *schBar;
-    
-    UITableView *tbl_result;
     
     NSMutableArray *arr_result;
     
     UIActivityIndicatorView *indViewLarge;
     
     NSMutableArray *arr_requests;
+    
+    UIScrollView *sclView_imgList;
 }
 
 @end

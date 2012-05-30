@@ -44,17 +44,17 @@
     //CFRelease((__bridge CFURLRef)url_pdf);
     pageCount = CGPDFDocumentGetNumberOfPages(pdf);
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"magazineNav.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"magazineNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
-    [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    btn_back.frame = CGRectMake(10, 7.5f, 55, 30);
+    [btn_back setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_back setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -82,8 +82,8 @@
 //    btn_nextPage.titleLabel.textAlignment = UITextAlignmentRight;
 //    [view_nav addSubview:btn_nextPage];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
-    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 960)];
+    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"whiteBackground_ipad.png"]];
     [self.view addSubview:view_content];
     
 //    NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
@@ -98,8 +98,8 @@
     UIImage *img_secondPage = [self getPDFImage:2];
     [arr_images addObject:img_firstPage];
     [arr_images addObject:img_secondPage];
-    sclView_pdf = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
-    sclView_pdf.contentSize = CGSizeMake(320 * [arr_images count], 415);
+    sclView_pdf = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 768, 960)];
+    sclView_pdf.contentSize = CGSizeMake(768 * [arr_images count], 960);
     sclView_pdf.pagingEnabled = YES;
     sclView_pdf.showsHorizontalScrollIndicator = NO;
     sclView_pdf.showsVerticalScrollIndicator = NO;
@@ -108,7 +108,7 @@
     sclView_pdf.delegate = self;
     [view_content addSubview:sclView_pdf];
     for (int i = 0; i < [arr_images count]; i++) {
-        UIScrollView *sclView_img = [[UIScrollView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 415)];
+        UIScrollView *sclView_img = [[UIScrollView alloc] initWithFrame:CGRectMake(768*i, 0, 768, 960)];
         sclView_img.showsHorizontalScrollIndicator = NO;
         sclView_img.showsVerticalScrollIndicator = NO;
         sclView_img.directionalLockEnabled = YES;
@@ -117,7 +117,7 @@
         sclView_img.maximumZoomScale = 2.0f;
         [sclView_pdf addSubview:sclView_img];
         
-        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 768, 960)];
         imgView.image = [arr_images objectAtIndex:i];
         [sclView_img addSubview:imgView];
     }
@@ -128,7 +128,7 @@
     con_page.backgroundColor = [UIColor clearColor];
     //[view_content addSubview:con_page];
     
-    lb_page = [[UILabel alloc] initWithFrame:CGRectMake(0, 375, 320, 30)];
+    lb_page = [[UILabel alloc] initWithFrame:CGRectMake(0, 930, 768, 30)];
     lb_page.backgroundColor = [UIColor clearColor];
     lb_page.textAlignment = UITextAlignmentCenter;
     lb_page.text = [NSString stringWithFormat:@"1/%d",pageCount];
@@ -185,7 +185,7 @@
 -(NSArray *)getPDFImages
 {
     NSMutableArray *arr_result = [[NSMutableArray alloc] init];
-    CGRect rect = CGRectMake(0, 0, 320, 415);
+    CGRect rect = CGRectMake(0, 0, 768, 960);
     NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
     NSURL *url_pdf = [[NSURL alloc] initFileURLWithPath:str_address];
     CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url_pdf);
@@ -230,7 +230,7 @@
 
 -(UIImage *)getPDFImage:(int)page
 {
-    CGRect rect = CGRectMake(0, 0, 320, 415);
+    CGRect rect = CGRectMake(0, 0, 768, 960);
     NSString *str_address = [dic_magazineInfo objectForKey:@"address"];
     NSURL *url_pdf = [[NSURL alloc] initFileURLWithPath:str_address];
     CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url_pdf);
@@ -294,21 +294,23 @@
     // load the visible page and the page on either side of it (to avoid flashes when the user starts scrolling)
     
     // A possible optimization would be to unload the views+controllers which are no longer visible
-    int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-	
-	//con_page.currentPage = index;
-    
-    lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
-    
-    float f_index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
-    if (f_index+1 > [arr_images count] && [arr_images count] < pageCount) {
-        [self addNewPDFView];
+    if (scrollView == sclView_pdf) {
+        int index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+        
+        //con_page.currentPage = index;
+        
+        lb_page.text = [NSString stringWithFormat:@"%d/%d",index +1,pageCount];
+        
+        float f_index = fabs(scrollView.contentOffset.x) / scrollView.frame.size.width;
+        if (f_index+1 > [arr_images count] && [arr_images count] < pageCount) {
+            [self addNewPDFView];
+        }
     }
 }
 
 -(void)addNewPDFView
 {
-    UIScrollView *sclView_img = [[UIScrollView alloc] initWithFrame:CGRectMake(320*[arr_images count], 0, 320, 415)];
+    UIScrollView *sclView_img = [[UIScrollView alloc] initWithFrame:CGRectMake(768*[arr_images count], 0, 768, 960)];
     sclView_img.showsHorizontalScrollIndicator = NO;
     sclView_img.showsVerticalScrollIndicator = NO;
     sclView_img.directionalLockEnabled = YES;
@@ -317,14 +319,14 @@
     sclView_img.maximumZoomScale = 2.0f;
     [sclView_pdf addSubview:sclView_img];
     
-    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 415)];
+    UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 768, 960)];
     UIImage *img = [self getPDFImage:[arr_images count] + 1];
     imgView.image = img;
     [sclView_img addSubview:imgView];
     
     [arr_images addObject:img];
     
-    [sclView_pdf setContentSize:CGSizeMake(320*[arr_images count], 415)];
+    [sclView_pdf setContentSize:CGSizeMake(768*[arr_images count], 960)];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView

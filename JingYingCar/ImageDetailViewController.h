@@ -40,6 +40,8 @@
     UIScrollView *sclView_imgList;
     
     NSMutableArray *arr_requests;
+    
+    UIView *view_imgList;
 }
 
 @property (nonatomic,retain) NSString *str_id;

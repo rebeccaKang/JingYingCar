@@ -26,6 +26,8 @@
 #define kWBAlertViewLogOutTag 100
 #define kWBAlertViewLogInTag  101
 
+#define settingViewTag 999
+
 @interface AppDelegate_IPad : UIResponder <UIApplicationDelegate,UITabBarControllerDelegate,ASIHTTPRequestDelegate>
 {
     UITabBarController *tabCon_main;
@@ -40,6 +42,8 @@
     NSMutableArray *arr_shouldRequest;
     
     NSMutableArray *arr_requests;
+    
+    BOOL isShowSetting;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -48,5 +52,6 @@
 @property (nonatomic) NSInteger fontSize;
 @property (nonatomic) NSInteger bufferTime;
 @property (nonatomic,retain) NSMutableArray *arr_shouldRequest;
+@property (nonatomic) BOOL isShowSetting;
 
 @end

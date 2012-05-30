@@ -43,40 +43,79 @@
 
 - (id)init
 {
-    if (self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])
-    {
-        // background settings
-        [self setBackgroundColor:[UIColor clearColor]];
-        [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
-        
-        // add the panel view
-        panelView = [[UIView alloc] initWithFrame:CGRectMake(10, 30, 300, 440)];
-        [panelView setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.55]];
-        [[panelView layer] setMasksToBounds:NO]; // very important
-        [[panelView layer] setCornerRadius:10.0];
-        [self addSubview:panelView];
-        
-        // add the conainer view
-        containerView = [[UIView alloc] initWithFrame:CGRectMake(10, 10, 280, 420)];
-        [[containerView layer] setBorderColor:[UIColor colorWithRed:0. green:0. blue:0. alpha:0.7].CGColor];
-        [[containerView layer] setBorderWidth:1.0];
-        
-        // add the web view
-        webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 280, 330)];
-		[webView setDelegate:self];
-		[containerView addSubview:webView];
-        
-        [panelView addSubview:containerView];
-        
-        indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [indicatorView setCenter:CGPointMake(160, 240)];
-        [self addSubview:indicatorView];
-        
-        UIButton *btn_close = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_close.frame = CGRectMake(285, -10, 25, 25);
-        [btn_close setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
-        [btn_close addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
-        [panelView addSubview:btn_close];
+    if (IS_IPAD) {
+        if (self = [super initWithFrame:CGRectMake(0, 0, 768, 1024)])
+        {
+            // background settings
+            [self setBackgroundColor:[UIColor clearColor]];
+            [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+            
+            // add the panel view
+            panelView = [[UIView alloc] initWithFrame:CGRectMake(30, 295, 708, 560)];
+            [panelView setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.55]];
+            [[panelView layer] setMasksToBounds:NO]; // very important
+            [[panelView layer] setCornerRadius:10.0];
+            [self addSubview:panelView];
+            
+            // add the conainer view
+            containerView = [[UIView alloc] initWithFrame:CGRectMake(30, 30, 648, 500)];
+            [[containerView layer] setBorderColor:[UIColor colorWithRed:0. green:0. blue:0. alpha:0.7].CGColor];
+            [[containerView layer] setBorderWidth:1.0];
+            
+            // add the web view
+            webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 648, 500)];
+            [webView setDelegate:self];
+            [containerView addSubview:webView];
+            
+            [panelView addSubview:containerView];
+            
+            indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            [indicatorView setCenter:CGPointMake(384, 512)];
+            [self addSubview:indicatorView];
+            
+            UIButton *btn_close = [UIButton buttonWithType:UIButtonTypeCustom];
+            btn_close.frame = CGRectMake(698, -10, 25, 25);
+            [btn_close setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+            [btn_close addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:btn_close];
+        }
+    }
+    else {
+        if (self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])
+        {
+            // background settings
+            [self setBackgroundColor:[UIColor clearColor]];
+            [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+            
+            // add the panel view
+            panelView = [[UIView alloc] initWithFrame:CGRectMake(10, 30, 300, 440)];
+            [panelView setBackgroundColor:[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.55]];
+            [[panelView layer] setMasksToBounds:NO]; // very important
+            [[panelView layer] setCornerRadius:10.0];
+            [self addSubview:panelView];
+            
+            // add the conainer view
+            containerView = [[UIView alloc] initWithFrame:CGRectMake(10, 10, 280, 420)];
+            [[containerView layer] setBorderColor:[UIColor colorWithRed:0. green:0. blue:0. alpha:0.7].CGColor];
+            [[containerView layer] setBorderWidth:1.0];
+            
+            // add the web view
+            webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 280, 330)];
+            [webView setDelegate:self];
+            [containerView addSubview:webView];
+            
+            [panelView addSubview:containerView];
+            
+            indicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            [indicatorView setCenter:CGPointMake(160, 240)];
+            [self addSubview:indicatorView];
+            
+            UIButton *btn_close = [UIButton buttonWithType:UIButtonTypeCustom];
+            btn_close.frame = CGRectMake(285, -10, 25, 25);
+            [btn_close setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+            [btn_close addTarget:self action:@selector(onCloseButtonTouched:) forControlEvents:UIControlEventTouchUpInside];
+            [panelView addSubview:btn_close];
+        }
     }
     return self;
 }
@@ -109,24 +148,42 @@
 {
     [self setTransform:CGAffineTransformIdentity];
     
-    if (UIInterfaceOrientationIsLandscape(orientation))
-    {
-        [self setFrame:CGRectMake(0, 0, 480, 320)];
-        [panelView setFrame:CGRectMake(10, 30, 460, 280)];
-        [containerView setFrame:CGRectMake(10, 10, 440, 260)];
-        [webView setFrame:CGRectMake(0, 0, 440, 260)];
-        [indicatorView setCenter:CGPointMake(240, 160)];
+    if (IS_IPAD) {
+        if (UIInterfaceOrientationIsLandscape(orientation))
+        {
+
+        }
+        else
+        {
+            [self setFrame:CGRectMake(0, 0, 768, 1024)];
+            [panelView setFrame:CGRectMake(30, 245, 708, 560)];
+            [containerView setFrame:CGRectMake(30, 30, 648, 500)];
+            [webView setFrame:CGRectMake(0, 0, 648, 500)];
+            [indicatorView setCenter:CGPointMake(384,512)];
+        }
+        
+        [self setCenter:CGPointMake(384, 512)];
     }
-    else
-    {
-        [self setFrame:CGRectMake(0, 0, 320, 480)];
-        [panelView setFrame:CGRectMake(10, 30, 300, 440)];
-        [containerView setFrame:CGRectMake(10, 10, 280, 420)];
-        [webView setFrame:CGRectMake(0, 0, 280, 420)];
-        [indicatorView setCenter:CGPointMake(160, 240)];
+    else {
+        if (UIInterfaceOrientationIsLandscape(orientation))
+        {
+            [self setFrame:CGRectMake(0, 0, 480, 320)];
+            [panelView setFrame:CGRectMake(10, 30, 460, 280)];
+            [containerView setFrame:CGRectMake(10, 10, 440, 260)];
+            [webView setFrame:CGRectMake(0, 0, 440, 260)];
+            [indicatorView setCenter:CGPointMake(240, 160)];
+        }
+        else
+        {
+            [self setFrame:CGRectMake(0, 0, 320, 480)];
+            [panelView setFrame:CGRectMake(10, 30, 300, 440)];
+            [containerView setFrame:CGRectMake(10, 10, 280, 420)];
+            [webView setFrame:CGRectMake(0, 0, 280, 420)];
+            [indicatorView setCenter:CGPointMake(160, 240)];
+        }
+        
+        [self setCenter:CGPointMake(160, 240)];
     }
-    
-    [self setCenter:CGPointMake(160, 240)];
     
     [self setTransform:[self transformForOrientation:orientation]];
     

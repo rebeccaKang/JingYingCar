@@ -11,15 +11,21 @@
 
 @interface TopicViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource>
 {
-    UITableView *tbl_topicList;
-    
     NSMutableArray *arr_topicList;
     NSArray *arr_class;
-    NSMutableArray *arr_topicID;
     
     UIActivityIndicatorView *indViewLarge;
     
     NSMutableArray *arr_requests;
+    
+    UITableView *tbl_topic;
+    
+    int currentType;
+    
+    UIButton *btn_engine;
+    UIButton *btn_ontheway;
+    UIButton *btn_view;
+    UIButton *btn_acceleration;
 }
 
 @end

@@ -32,17 +32,17 @@
     [super loadView];
     arr_requests = [[NSMutableArray alloc] init];
     
-    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 45)];
+    UIView *view_nav = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 45)];
     view_nav.backgroundColor = [UIColor clearColor];
     [self.view addSubview:view_nav];
     
     UIImageView *imgView_navBK = [[UIImageView alloc] initWithFrame:view_nav.bounds];
-    imgView_navBK.image = [UIImage imageNamed:@"navDefault.png"];
+    imgView_navBK.image = [UIImage imageNamed:@"magazineNav_ipad.png"];
     [view_nav addSubview:imgView_navBK];
     
     UIButton *btn_back = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_back.frame = CGRectMake(10, 7.5f, 50, 30);
-    [btn_back setBackgroundImage:[UIImage imageNamed:@"backBtn.png"] forState:UIControlStateNormal];
+    btn_back.frame = CGRectMake(10, 7.5f, 55, 30);
+    [btn_back setBackgroundImage:[UIImage imageNamed:@"back_ipad.png"] forState:UIControlStateNormal];
     //[btn_back setTitle:@" 返回" forState:UIControlStateNormal];
     [btn_back addTarget:self action:@selector(turnBack) forControlEvents:UIControlEventTouchUpInside];
     [btn_back setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -51,17 +51,17 @@
     [view_nav addSubview:btn_back];
     
     UIButton *btn_delete = [UIButton buttonWithType:UIButtonTypeCustom];
-    btn_delete.frame = CGRectMake(260, 7, 60, 30);
-    [btn_delete setBackgroundImage:[UIImage imageNamed:@"rectButton.png"] forState:UIControlStateNormal];
-    [btn_delete setTitle:@" 删除" forState:UIControlStateNormal];
+    btn_delete.frame = CGRectMake(695, 7.5f, 60, 30);
+    [btn_delete setBackgroundImage:[UIImage imageNamed:@"rectButton_ipad.png"] forState:UIControlStateNormal];
+    [btn_delete setTitle:@"删除" forState:UIControlStateNormal];
     [btn_delete addTarget:self action:@selector(deleteMode) forControlEvents:UIControlEventTouchUpInside];
     [btn_delete setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    btn_delete.titleLabel.font = [UIFont boldSystemFontOfSize:14];
+    btn_delete.titleLabel.font = [UIFont boldSystemFontOfSize:17];
     btn_delete.titleLabel.textAlignment = UITextAlignmentRight;
     [view_nav addSubview:btn_delete];
     
-    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 320, 415)];
-    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background.png"]];
+    UIView *view_content = [[UIView alloc] initWithFrame:CGRectMake(0, 45, 768, 960)];
+    view_content.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"whiteBackground_ipad.png"]];
     [self.view addSubview:view_content];
     
     arr_magazineData = [[NSMutableArray alloc] init];
@@ -77,6 +77,7 @@
     [view_content addSubview:tbl_magazineList];
     
     isDeleteMode = NO;
+    isScrolling = NO;
 }
 
 - (void)viewDidLoad
@@ -106,7 +107,7 @@
 
 -(void)downloadMagazine:(UIButton *)sender
 {
-    [sender setTitle:@"正在下载" forState:UIControlStateNormal];
+    //[sender setTitle:@"正在下载" forState:UIControlStateNormal];
     sender.enabled = NO;
     UITableViewCell *cell = (UITableViewCell *)sender.superview.superview.superview;
     NSIndexPath *indexpath = [tbl_magazineList indexPathForCell:cell];
@@ -136,7 +137,7 @@
     [request setUserInfo:dic_userInfo];
     //[request setRequestMethod:@"POST"];
     //添加到ASINetworkQueue队列去下载
-    AppDelegate *app = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    AppDelegate_IPad *app = (AppDelegate_IPad *)[UIApplication sharedApplication].delegate;
 	[app.netWorkQueue addOperation:request];
     [arr_requests addObject:request];
 }
@@ -181,7 +182,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 90;
+    return 192;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -191,68 +192,76 @@
     // Configure the cell...
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-        UIView *view_bk = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 90)];
-        view_bk.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"magazineTableview.png"]];
+        UIView *view_bk = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 768, 192)];
+        view_bk.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"downloadTable_ipad.png"]];
         view_bk.tag = 0;
         [cell.contentView addSubview:view_bk];
         //cell.userInteractionEnabled = NO;
         
-        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(15, 5, 60, 80)];
+        UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(30, 25, 88, 132)];
         imgView.tag = 1;
         [view_bk addSubview:imgView];
         
-        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(90, 0, 130, 30)];
-        lb_title.textColor = [UIColor grayColor];
-        lb_title.font = [UIFont systemFontOfSize:16];
+        UILabel *lb_title = [[UILabel alloc] initWithFrame:CGRectMake(140, 15, 400, 45)];
+        lb_title.textColor = [UIColor blackColor];
+        lb_title.font = [UIFont systemFontOfSize:24];
         lb_title.backgroundColor = [UIColor clearColor];
         lb_title.tag = 2;
         [view_bk addSubview:lb_title];
         
-        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(90, 30, 130, 30)];
+        UILabel *lb_summary = [[UILabel alloc] initWithFrame:CGRectMake(140, 70, 400, 45)];
         lb_summary.lineBreakMode = UILineBreakModeMiddleTruncation;
         lb_summary.textColor = [UIColor blackColor];
-        lb_summary.font = [UIFont systemFontOfSize:16];
+        lb_summary.font = [UIFont systemFontOfSize:24];
         lb_summary.backgroundColor = [UIColor clearColor];
         lb_summary.tag = 3;
         [view_bk addSubview:lb_summary];
         
-        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(90, 60, 130, 30)];
-        lb_update.textColor = [UIColor colorWithRed:0.384 green:0.286 blue:0.224 alpha:1];
-        lb_update.font = [UIFont systemFontOfSize:16];
+        UILabel *lb_update = [[UILabel alloc] initWithFrame:CGRectMake(140, 125, 400, 45)];
+        lb_update.textColor = [UIColor blackColor];
+        lb_update.font = [UIFont systemFontOfSize:24];
         lb_update.backgroundColor = [UIColor clearColor];
         lb_update.tag = 4;
         [view_bk addSubview:lb_update];
         
         UIButton *btn_download = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_download.frame = CGRectMake(230, 30, 80, 30);
-        [btn_download setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
+        btn_download.frame = CGRectMake(540, 60, 196, 56);
+        [btn_download setBackgroundImage:[UIImage imageNamed:@"download_ipad.png"] forState:UIControlStateNormal];
         [btn_download setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [btn_download setTitle:@"下载" forState:UIControlStateNormal];
+        //[btn_download setTitle:@"下载" forState:UIControlStateNormal];
         btn_download.titleLabel.font = [UIFont boldSystemFontOfSize:14];
         btn_download.tag = 5;
         [btn_download addTarget:self action:@selector(downloadMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_download];
         
         UIButton *btn_read = [UIButton buttonWithType:UIButtonTypeCustom];
-        btn_read.frame = CGRectMake(230, 30, 80, 30);
+        btn_read.frame = CGRectMake(540, 60, 196, 56);
         [btn_read setBackgroundImage:[UIImage imageNamed:@"download.png"] forState:UIControlStateNormal];
         [btn_read setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [btn_read setTitle:@"阅读" forState:UIControlStateNormal];
-        btn_read.titleLabel.font = [UIFont boldSystemFontOfSize:14];
+        btn_read.titleLabel.font = [UIFont boldSystemFontOfSize:28];
         btn_read.tag = 6;
         [btn_read addTarget:self action:@selector(readMagazine:) forControlEvents:UIControlEventTouchUpInside];
         [view_bk addSubview:btn_read];
         
-        UIImageView *imgView_progressBottom = [[UIImageView alloc] initWithFrame:CGRectMake(230, 70, 80, 10)];
-        imgView_progressBottom.image = [UIImage imageNamed:@"pgBottom.png"];
+        UIImageView *imgView_progressBottom = [[UIImageView alloc] initWithFrame:CGRectMake(515, 140, 246, 8)];
+        //imgView_progressBottom.image = [UIImage imageNamed:@"pgBottom_ipad.png"];
         [view_bk addSubview:imgView_progressBottom];
         imgView_progressBottom.hidden = YES; 
         imgView_progressBottom.tag = 7;
         
-        UIImageView *imgView_progressTop = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, 10)];
-        imgView_progressTop.image = [UIImage imageNamed:@"pgTop.png"];
+        UIImageView *imgView_progressTop = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 0, 8)];
+        imgView_progressTop.image = [UIImage imageNamed:@"pgTop_ipad.png"];
         [imgView_progressBottom addSubview:imgView_progressTop];
         imgView_progressTop.tag = 8;
+        
+        UILabel *lb_progress = [[UILabel alloc] initWithFrame:CGRectMake(515, 160, 246, 20)];
+        lb_progress.font = [UIFont systemFontOfSize:18];
+        lb_progress.textColor = [UIColor blackColor];
+        lb_progress.textAlignment = UITextAlignmentCenter;
+        lb_progress.tag = 9;
+        lb_progress.backgroundColor = [UIColor clearColor];
+        [view_bk addSubview:lb_progress];
         
         //        UIButton *btn_read = [UIButton buttonWithType:UIButtonTypeCustom];
         //        btn_read.frame = CGRectMake(230, 10, 80, 30);
@@ -275,7 +284,7 @@
             img_cover = [UIImage imageWithContentsOfFile:str_coverAddress];
         }
         else {
-            img_cover = [UIImage imageNamed:@"bookcover.png"];
+            img_cover = [UIImage imageNamed:@"magazinecover_ipad.png"];
         }
         UIImageView *imgView_cover = (UIImageView *)[view_bk viewWithTag:1];
         imgView_cover.image = img_cover;
@@ -322,7 +331,13 @@
                 
                 UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:8];
                 CGFloat percent = [[dic_magazineData objectForKey:@"percent"] floatValue];
-                imgView_top.frame = CGRectMake(0, 0, 80*percent, 10);
+//                CGImageRef imgRef = CGImageCreateWithImageInRect([[UIImage imageNamed:@"pgTop_ipad.png"] CGImage], CGRectMake(0, 0, 246*percent, 8));
+//                UIImage *img = [UIImage imageWithCGImage:imgRef];
+//                imgView_top.image = img;
+                imgView_top.frame = CGRectMake(0, 0, 246*percent, 8);
+                
+                UILabel *lb_progress = (UILabel *)[view_bk viewWithTag:9];
+                lb_progress.text = [NSString stringWithFormat:@"%.2f %%",percent *100];
                 break;
             }
         }
@@ -343,6 +358,11 @@
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
 }
 
 // Override to support editing the table view.
@@ -381,6 +401,21 @@
     return UITableViewCellAccessoryNone;
 }
 
+#pragma mark - scrollviewDelegate
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (scrollView == tbl_magazineList) {
+        isScrolling = NO;
+    }
+}
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if (scrollView == tbl_magazineList) {
+        isScrolling = YES;
+    }
+}
+
 #pragma mark -
 #pragma mark ASIHttpRequestDelegate
 //ASIHTTPRequestDelegate,下载之前获取信息的方法,主要获取下载内容的大小
@@ -414,7 +449,9 @@
             CGFloat percent = data_magazine.length/dataLength;
             NSLog(@"%d,%f,%f",data_magazine.length,dataLength,percent);
             [dic_magazineData setObject:[NSString stringWithFormat:@"%f",percent] forKey:@"percent"];
-            [tbl_magazineList reloadData];
+            if (isScrolling == NO) {
+                [tbl_magazineList reloadData];
+            }
             break;
         }
     }
@@ -436,8 +473,10 @@
         
         UIImageView *imgView_progressBottem = (UIImageView *)[btn_temp.superview.superview viewWithTag:7];
         UIImageView *imgView_top = (UIImageView *)[imgView_progressBottem viewWithTag:8];
-        imgView_top.frame = CGRectMake(0, 0, 80, 10);
+        UILabel *lb_progress = (UILabel *)[btn_temp.superview.superview viewWithTag:9];
+        imgView_top.frame = CGRectMake(0, 0, 160, 20);
         imgView_progressBottem.hidden = YES;
+        lb_progress.text = @"";
         
         NSString *str_id = [dic_userInfo objectForKey:@"id"];
         for (int i = 0; i < [arr_magazineData count]; i++) {
@@ -462,7 +501,9 @@
             if ([str_id isEqualToString:str_tempID]) {
                 NSDictionary *dic_magazine = [[SqlManager sharedManager] getMagazineInfoWithID:str_id];
                 [arr_magazineList replaceObjectAtIndex:i withObject:dic_magazine];
-                [tbl_magazineList reloadData];
+                if (isScrolling == NO) {
+                    [tbl_magazineList reloadData];
+                }
                 break;
             }
         }

@@ -257,7 +257,8 @@
 -(NSString *)magazineListRequestBody
 {
     DDXMLNode *node_operate = [DDXMLNode elementWithName:@"Operate" stringValue:@"GetMagazine"];
-    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,nil];
+    DDXMLNode *node_device = [DDXMLNode elementWithName:@"Device" stringValue:@"iphone"];
+    NSArray *arr_request = [[NSArray alloc] initWithObjects:node_operate,node_device,nil];
     DDXMLElement *element_request = [[DDXMLElement alloc] initWithName: @"Request"];
     [element_request setChildren:arr_request];
     return [element_request XMLString];
@@ -266,6 +267,9 @@
 -(void)requestCover:(NSDictionary *)info
 {
     NSString *str_imgUrl = [info objectForKey:@"coverImgUrl"];
+    if ([str_imgUrl length] == 0) {
+        return;
+    }
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@/%@",BASIC_URL,str_imgUrl]];
     //设置
 	ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:url];

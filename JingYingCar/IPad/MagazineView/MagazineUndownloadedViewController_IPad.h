@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import "AppDelegate_IPad.h"
 
 @protocol MagazineEditDelegate <NSObject>
 
@@ -15,7 +15,7 @@
 
 @end
 
-@interface MagazineUndownloadedViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource,ASIHTTPRequestDelegate>
+@interface MagazineUndownloadedViewController_IPad : UIViewController<UITableViewDelegate,UITableViewDataSource,ASIHTTPRequestDelegate,UIScrollViewDelegate>
 {
     NSMutableArray *arr_magazineList;
     UITableView *tbl_magazineList;
@@ -27,6 +27,8 @@
     id<MagazineEditDelegate>delegate;
     
     NSMutableArray *arr_requests;
+    
+    BOOL isScrolling;
 }
 
 @property (nonatomic,retain) id<MagazineEditDelegate>delegate;
